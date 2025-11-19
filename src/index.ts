@@ -20,33 +20,55 @@ interface ProjectConfiguration {
   accessToken: string;
 }
 
-const supportedFileFormats = ['json', 'yaml', 'yml'];
+const supportedFileFormats = ['json', 'yaml', 'xml'];
 const labelFileName = 'labels';
+const globIgnorePatterns = [
+  'node_modules',
+  'dist',
+  'build',
+  'out',
+  'coverage',
+  '.tmp',
+  '.gradle',
+  'DerivedData',
+  'Pods',
+  'xcuserdata',
+  '.git',
+  '.idea',
+  'reports',
+  '__tests__',
+];
+
+const theme = undefined;
 
 async function main() {
   const config: ProjectConfiguration | undefined =
     await tryAcquireProjectConfig();
 
   if (!config) {
-    log(chalk.red('Unable to proceed without an access token.'));
-    process.exit(1);
+    log(chalk.yellow('Unable to proceed without project configuration.'));
+    return;
   }
+
+  const possibleLabelFile = await tryAcquireLabelFile();
+
+  const labelFile = await labelFilePathWithFallback(possibleLabelFile);
 
   const action = await select(
     {
       message: 'Select an action to perform:',
       choices: [
-        { name: 'Synchronize local with remote', value: 'sync' },
-        { name: 'Fetch labels from remote', value: 'fetch' },
+        { name: 'Fetch labels', value: 'fetch' },
+        { name: 'Sync to remote', value: 'sync' },
       ],
+      theme,
     },
     { clearPromptOnDone: true }
   );
 
   switch (action) {
     case 'fetch':
-      await tryFetchLabels(config);
-      log(chalk.green('Labels fetched successfully!'));
+      await tryFetchLabels(config, labelFile);
       return;
     case 'sync':
       log(chalk.yellow('Synchronization feature is not implemented yet.'));
@@ -57,15 +79,13 @@ async function main() {
   }
 }
 
+/**
+ * Fetches labels from the remote project and writes them to the local label file.
+ */
 async function tryFetchLabels(
-  projectConfig: ProjectConfiguration
+  projectConfig: ProjectConfiguration,
+  labelFilePath: string
 ): Promise<void> {
-  const labelFilePath = await tryAcquireLabelFile();
-
-  if (!labelFilePath) {
-    log(chalk.red('No label file selected. Unable to proceed.'));
-    process.exit(1);
-  }
   const format = await tryInferFormatFromFileName(labelFilePath);
 
   if (!format) {
@@ -85,6 +105,7 @@ async function tryFetchLabels(
   );
   if (!response.ok) {
     log(chalk.red(`Failed to fetch labels: ${response.statusText}`));
+    console.error(`Format: ${format}`, await response.text());
     process.exit(1);
   }
 
@@ -92,9 +113,26 @@ async function tryFetchLabels(
 
   await writeFile(labelFilePath, data, { encoding: 'utf-8' });
 
-  log(chalk.green(`Labels written to ${labelFilePath}`));
+  log(
+    chalk.blue(
+      `Labels have been written to ${chalk.cyan.underline(
+        toRelativePath(labelFilePath)
+      )}`
+    )
+  );
 }
 
+function toRelativePath(absolutePath: string): string {
+  return absolutePath.replace(process.cwd(), '.');
+}
+
+/**
+ * Attempts to infer the label file format from its file name.
+ * If the format cannot be inferred, prompts the user to select one.
+ *
+ * @param labelFilePath - The path to the label file.
+ * @returns A Promise that resolves to the inferred or selected file format, or undefined if not selected.
+ */
 async function tryInferFormatFromFileName(
   labelFilePath: string
 ): Promise<string | undefined> {
@@ -108,9 +146,57 @@ async function tryInferFormatFromFileName(
         name: format,
         value: format,
       })),
+      theme,
     });
   }
   return format;
+}
+
+async function labelFilePathWithFallback(
+  initialPath?: string
+): Promise<string> {
+  if (initialPath) {
+    return initialPath;
+  }
+  log(chalk.yellow('Unable to locate any label files in your project.'));
+  const shouldCreate = await select(
+    {
+      message: 'Would you like to create a new labels file?',
+      choices: [
+        { name: 'Yes', value: true },
+        { name: 'No', value: false },
+      ],
+      theme,
+    },
+    { clearPromptOnDone: true }
+  );
+  if (!shouldCreate) {
+    log(chalk.yellow('Exiting without creating a label file.'));
+    process.exit(0);
+  }
+
+  const format = await select(
+    {
+      message: 'Select the label file format to create:',
+      choices: supportedFileFormats.map(format => ({
+        name: format,
+        value: format,
+      })),
+      theme,
+    },
+    { clearPromptOnDone: true }
+  );
+
+  const newLabelFilePath = `${process.cwd()}/${labelFileName}.${format}`;
+  await writeFile(newLabelFilePath, '', { encoding: 'utf-8' });
+  log(
+    chalk.blue(
+      `Created new label file at ${chalk.cyan.underline(
+        toRelativePath(newLabelFilePath)
+      )}`
+    )
+  );
+  return newLabelFilePath;
 }
 
 async function tryAcquireLabelFile(): Promise<string | undefined> {
@@ -120,12 +206,11 @@ async function tryAcquireLabelFile(): Promise<string | undefined> {
       cwd: process.cwd(),
       nodir: true,
       absolute: true,
+      ignore: globIgnorePatterns,
     }
   );
 
   if (!files.length) {
-    // Inquire?
-    log(chalk.yellow('No label files found in the current directory.'));
     return undefined;
   }
 
@@ -133,13 +218,17 @@ async function tryAcquireLabelFile(): Promise<string | undefined> {
     return files[0];
   }
 
-  return await select({
-    message: 'Multiple label files found. Please select one to use:',
-    choices: files.map(filePath => ({
-      name: filePath,
-      value: filePath,
-    })),
-  });
+  return await select(
+    {
+      message: 'Multiple label files found. Please select one to use:',
+      choices: files.map(filePath => ({
+        name: toRelativePath(filePath),
+        value: filePath,
+      })),
+      theme,
+    },
+    { clearPromptOnDone: true }
+  );
 }
 
 /**
@@ -176,7 +265,12 @@ async function tryAcquireProjectConfig(): Promise<
   if (!projectFromEnv) {
     log(
       chalk.yellow(
-        `Unable to locate project configuration in the selected .env file (${dotEnvPath}).\nMake sure it contains LABELEER_<ENV>_TOKEN and LABELEER_<ENV>_PROJECT_ID variables.`
+        `Unable to locate project configuration from ${chalk.bold.yellowBright(dotEnvPath)}.`
+      )
+    );
+    log(
+      chalk.yellow(
+        `Make sure it contains both ${chalk.bold.yellowBright('LABELEER_ACCESS_TOKEN')} and ${chalk.bold.yellowBright('LABELEER_PROJECT_ID')}.`
       )
     );
     return await inquireProjectConfig();
@@ -198,13 +292,17 @@ async function tryDeduceEnvFilePath(
     return candidates[0];
   }
 
-  return await select({
-    message: 'Identified multiple .env files. Please select one to use:',
-    choices: candidates.map(fileName => ({
-      name: fileName,
-      value: fileName,
-    })),
-  });
+  return await select(
+    {
+      message: 'Identified multiple .env files. Please select one to use:',
+      choices: candidates.map(fileName => ({
+        name: fileName,
+        value: fileName,
+      })),
+      theme,
+    },
+    { clearPromptOnDone: true }
+  );
 }
 
 /**
@@ -277,6 +375,7 @@ async function tryReadTokenFromEnv(
       name: token,
       value: token,
     })),
+    theme,
   });
 
   const projectId = await select({
@@ -285,6 +384,7 @@ async function tryReadTokenFromEnv(
       name: id,
       value: id,
     })),
+    theme,
   });
 
   return { accessToken, projectId };
