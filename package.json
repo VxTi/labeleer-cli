@@ -1,15 +1,20 @@
 {
-  "type": "module",
+  "name": "labeleer-sync-cli",
   "version": "1.0.0",
+  "type": "module",
   "author": "Luca Warmenhoven",
   "license": "ISC",
+  "main": "./src/index.ts",
   "scripts": {
+    "run": "tsx ./src/index.ts",
     "build": "",
     "sync": ""
   },
   "dependencies": {
     "@inquirer/prompts": "^8.0.1",
+    "@types/node": "^24.10.1",
     "chalk": "^5.6.2",
+    "glob": "^13.0.0",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd",
@@ -21,7 +26,9 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-unused-imports": "^4.3.0",
+    "jiti": "^2.6.1",
     "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
     "typescript-eslint": "^8.47.0"
   }
 }

@@ -1,0 +1,638 @@
+{
+  "breadcrumbs.page.product_catalog": {
+    "translations": {
+      "en_US": "Products",
+      "nl_NL": "Producten"
+    }
+  },
+  "breadcrumbs.page.home": {
+    "translations": {
+      "en_US": "Home",
+      "nl_NL": "Thuispagina"
+    }
+  },
+  "a11y.navigation.favorites": {
+    "translations": {
+      "en_US": "My favorites",
+      "nl_NL": "Mijn favorieten"
+    }
+  },
+  "a11y.navigation.account": {
+    "translations": {
+      "en_US": "My account",
+      "nl_NL": "Mijn account"
+    }
+  },
+  "a11y.navigation.cart": {
+    "translations": {
+      "en_US": "My cart",
+      "nl_NL": "Mijn winkelwagen"
+    }
+  },
+  "a11y.navigation.search": {
+    "translations": {
+      "en_US": "Search for a product",
+      "nl_NL": "Zoek een product"
+    }
+  },
+  "a11y.navigation.open_menu": {
+    "translations": {
+      "en_US": "Open menu",
+      "nl_NL": "Open navigatie menu"
+    }
+  },
+  "store.opening_hours.status.closed_until_further_notice": {
+    "translations": {
+      "en_US": "Store is closed until further notice",
+      "nl_NL": "De winkel is gesloten tot nader bericht"
+    }
+  },
+  "store.opening_hours.status.open": {
+    "translations": {
+      "en_US": "We're open today until {}",
+      "nl_NL": "We zijn vandaag open tot {}"
+    }
+  },
+  "store.opening_hours.status.closes_soon_at": {
+    "translations": {
+      "en_US": "Store closes soon at {}",
+      "nl_NL": "De winkel sluit binnenkort om {}"
+    }
+  },
+  "store.opening_hours.status.opens_today_at": {
+    "translations": {
+      "en_US": "Store opens today at {}",
+      "nl_NL": "De winkel opent vandaag om {}"
+    }
+  },
+  "store.opening_hours.status.opens_next_at": {
+    "translations": {
+      "en_US": "Store opens again on {} at {}",
+      "nl_NL": "De winkel opent weer op {} om {}"
+    }
+  },
+  "store.opening_hours.status.closed_today": {
+    "translations": {
+      "en_US": "Store is closed today",
+      "nl_NL": "De winkel is vandaag gesloten"
+    }
+  },
+  "store.opening_hours.open": {
+    "translations": {
+      "en_US": "Open",
+      "nl_NL": "Open"
+    }
+  },
+  "store.opening_hours.closed": {
+    "translations": {
+      "en_US": "Closed",
+      "nl_NL": "Gesloten"
+    }
+  },
+  "store.opening_hours.sunday": {
+    "translations": {
+      "en_US": "Sunday",
+      "nl_NL": "Zondag"
+    }
+  },
+  "store.opening_hours.saturday": {
+    "translations": {
+      "en_US": "Saturday",
+      "nl_NL": "Zaterdag"
+    }
+  },
+  "store.opening_hours.friday": {
+    "translations": {
+      "en_US": "Friday",
+      "nl_NL": "Vrijdag"
+    }
+  },
+  "store.opening_hours.thursday": {
+    "translations": {
+      "en_US": "Thursday",
+      "nl_NL": "Donderdag"
+    }
+  },
+  "store.opening_hours.wednesday": {
+    "translations": {
+      "en_US": "Wednesday",
+      "nl_NL": "Woensdag"
+    }
+  },
+  "store.opening_hours.tuesday": {
+    "translations": {
+      "en_US": "Tuesday",
+      "nl_NL": "Dinsdag"
+    }
+  },
+  "store.opening_hours.monday": {
+    "translations": {
+      "en_US": "Monday",
+      "nl_NL": "Maandag"
+    }
+  },
+  "store.opening_hours.heading.time": {
+    "translations": {
+      "en_US": "Time",
+      "nl_NL": "Tijd"
+    }
+  },
+  "store.opening_hours.heading.day": {
+    "translations": {
+      "en_US": "Day",
+      "nl_NL": "Dag"
+    }
+  },
+  "store.opening_hours.title": {
+    "translations": {
+      "en_US": "Opening hours",
+      "nl_NL": "Openingstijden"
+    }
+  },
+  "payment.status.identifier": {
+    "translations": {
+      "en_US": "Payment ID {}",
+      "nl_NL": "Betaling ID {}"
+    }
+  },
+  "payment.status.return_to_store": {
+    "translations": {
+      "en_US": "Return to the store",
+      "nl_NL": "Terug naar de winkel"
+    }
+  },
+  "payment.status.failure.description": {
+    "translations": {
+      "en_US": "Unfortunately we haven't been able to process your payment.\nIf you believe this is caused by us, feel free to reach out, or try again later",
+      "nl_NL": "We hebben de bestelling helaas niet kunnen verwerken. Indien dit door\nons komt, neem gerust contact met ons op, of probeer het later nog eens."
+    }
+  },
+  "payment.status.failure.title": {
+    "translations": {
+      "en_US": "Payment failed...",
+      "nl_NL": "Bestelling helaas mislukt..."
+    }
+  },
+  "payment.status.success.description": {
+    "translations": {
+      "en_US": "Thank you for your order! We'll be processing it as soon as possible.",
+      "nl_NL": "Bedankt voor je bestelling!. We hebben je betaling ontvangen en\nverwerken van je bestelling zo spoedig mogelijk."
+    }
+  },
+  "payment.status.success.title": {
+    "translations": {
+      "en_US": "Payment succeeded!",
+      "nl_NL": "Betaling bevestigd!"
+    }
+  },
+  "payment.status.cart_empty": {
+    "translations": {
+      "en_US": "Your cart is empty",
+      "nl_NL": "Je winkelwagen is leeg"
+    }
+  },
+  "payment.status.idle": {
+    "translations": {
+      "en_US": "Pay €{}",
+      "nl_NL": "Betaal €{}"
+    }
+  },
+  "payment.status.succeeded": {
+    "translations": {
+      "en_US": "Payment completed!",
+      "nl_NL": "Betaling voltooid!"
+    }
+  },
+  "payment.status.processing": {
+    "translations": {
+      "en_US": "Processing payment...",
+      "nl_NL": "Aan het verwerken..."
+    }
+  },
+  "auth.no_account.notice": {
+    "translations": {
+      "en_US": "No account yet? Register here",
+      "nl_NL": "Nog geen account? Registreer hier"
+    }
+  },
+  "auth.sign_in_hint": {
+    "translations": {
+      "en_US": "Already an account? Sign in",
+      "nl_NL": "Al een account? Log in"
+    }
+  },
+  "auth.sign_in_with": {
+    "translations": {
+      "en_US": "Sign in with {}",
+      "nl_NL": "Log in met {}"
+    }
+  },
+  "auth.return_to": {
+    "translations": {
+      "en_US": "Return",
+      "nl_NL": "Terug"
+    }
+  },
+  "auth.form.label.password": {
+    "translations": {
+      "en_US": "Password",
+      "nl_NL": "Wachtwoord"
+    }
+  },
+  "auth.form.label.email": {
+    "translations": {
+      "en_US": "Email",
+      "nl_NL": "Email"
+    }
+  },
+  "auth.form.forgot_password": {
+    "translations": {
+      "en_US": "Forgot password?",
+      "nl_NL": "Wachtwoord vergeten?"
+    }
+  },
+  "user.cart.summary.total": {
+    "translations": {
+      "en_US": "Total:",
+      "nl_NL": "Totaal:"
+    }
+  },
+  "user.cart.summary.shipping_cost": {
+    "translations": {
+      "en_US": "Shipping cost:",
+      "nl_NL": "Verzendkosten:"
+    }
+  },
+  "user.cart.summary.vat": {
+    "translations": {
+      "en_US": "VAT:",
+      "nl_NL": "BTW:"
+    }
+  },
+  "user.cart.summary.pre_vat": {
+    "translations": {
+      "en_US": "Before VAT:",
+      "nl_NL": "Voor BTW:"
+    }
+  },
+  "user.actions.continue_to_payment": {
+    "translations": {
+      "en_US": "Continue to checkout",
+      "nl_NL": "Verder naar betalen"
+    }
+  },
+  "user.actions.continue_shopping": {
+    "translations": {
+      "en_US": "Continue shopping",
+      "nl_NL": "Verder met winkelen"
+    }
+  },
+  "user.actions.return_to_cart": {
+    "translations": {
+      "en_US": "Return to cart",
+      "nl_NL": "Terug naar winkelwagen"
+    }
+  },
+  "user.actions.update_password": {
+    "translations": {
+      "en_US": "Change password",
+      "nl_NL": "Verander wachtwoord"
+    }
+  },
+  "user.actions.view_cart": {
+    "translations": {
+      "en_US": "View cart",
+      "nl_NL": "Bekijk winkelwagen"
+    }
+  },
+  "user.actions.unauthorized_notice": {
+    "translations": {
+      "en_US": "You're not logged in yet.",
+      "nl_NL": "Je bent nog niet ingelogd."
+    }
+  },
+  "user.actions.view_purchases": {
+    "translations": {
+      "en_US": "View purchases",
+      "nl_NL": "Bekijk aankopen"
+    }
+  },
+  "user.actions.sign_out": {
+    "translations": {
+      "en_US": "Sign out",
+      "nl_NL": "Uitloggen"
+    }
+  },
+  "user.actions.sign_up": {
+    "translations": {
+      "en_US": "Register",
+      "nl_NL": "Registreren"
+    }
+  },
+  "user.actions.order_history": {
+    "translations": {
+      "en_US": "Purchases",
+      "nl_NL": "Bestellingen"
+    }
+  },
+  "user.actions.favorites": {
+    "translations": {
+      "en_US": "My favorites",
+      "nl_NL": "Mijn favorieten"
+    }
+  },
+  "user.actions.sign_in": {
+    "translations": {
+      "en_US": "Sign in",
+      "nl_NL": "Inloggen"
+    }
+  },
+  "user.actions.add_to_cart": {
+    "translations": {
+      "en_US": "Add to cart",
+      "nl_NL": "Voeg toe"
+    }
+  },
+  "search.history.clear_all": {
+    "translations": {
+      "en_US": "Clear all",
+      "nl_NL": "Alles verwijderen"
+    }
+  },
+  "search.history.no_history": {
+    "translations": {
+      "en_US": "You haven't searched for anything yet.",
+      "nl_NL": "Je hebt nog geen zoekopdrachten"
+    }
+  },
+  "search.history.title": {
+    "translations": {
+      "en_US": "Past searches",
+      "nl_NL": "Vorige zoekopdrachten"
+    }
+  },
+  "search.placeholder": {
+    "translations": {
+      "en_US": "Find products",
+      "nl_NL": "Zoek naar producten"
+    }
+  },
+  "products.results.query": {
+    "translations": {
+      "en_US": "Search results for \"{}\"",
+      "nl_NL": "Zoekresultaten voor \"{}\""
+    }
+  },
+  "products.results.query.view_all": {
+    "translations": {
+      "en_US": "View all products",
+      "nl_NL": "Toon alle producten"
+    }
+  },
+  "products.results.query.no_results": {
+    "translations": {
+      "en_US": "No products found with term \"{}\"",
+      "nl_NL": "Helaas geen producten gevonden met de zoekterm \"{}\""
+    }
+  },
+  "products.results.no_results": {
+    "translations": {
+      "en_US": "No products found",
+      "nl_NL": "Helaas geen producten gevonden"
+    }
+  },
+  "products.results.view_all": {
+    "translations": {
+      "en_US": "All products",
+      "nl_NL": "Alle producten"
+    }
+  },
+  "products.sorting.price_high_low": {
+    "translations": {
+      "en_US": "Price: high to low",
+      "nl_NL": "Prijs: hoog naar laag"
+    }
+  },
+  "products.sorting.price_low_high": {
+    "translations": {
+      "en_US": "Price: low to high",
+      "nl_NL": "Prijs: laag naar hoog"
+    }
+  },
+  "products.sorting.oldest_first": {
+    "translations": {
+      "en_US": "Newest first",
+      "nl_NL": "Oudste eerst"
+    }
+  },
+  "products.sorting.new_first": {
+    "translations": {
+      "en_US": "Oldest first",
+      "nl_NL": "Nieuwste eerst"
+    }
+  },
+  "product.not_found.continue_shopping": {
+    "translations": {
+      "en_US": "Continue shopping",
+      "nl_NL": "Verder met winkelen"
+    }
+  },
+  "product.not_found.body": {
+    "translations": {
+      "en_US": "This product could not be found",
+      "nl_NL": "Dit product kon helaas niet worden gevonden."
+    }
+  },
+  "product.not_found.heading": {
+    "translations": {
+      "en_US": "Oops...",
+      "nl_NL": "Oeps..."
+    }
+  },
+  "product.section.pairs_well_with.heading": {
+    "translations": {
+      "en_US": "Pairs well with",
+      "nl_NL": "Gaat goed samen met"
+    }
+  },
+  "product.nutritional_values.natriumsalt": {
+    "translations": {
+      "en_US": "Salts",
+      "nl_NL": "Zout"
+    }
+  },
+  "product.nutritional_values.protein": {
+    "translations": {
+      "en_US": "Protein",
+      "nl_NL": "Proteine"
+    }
+  },
+  "product.nutritional_values.fibers": {
+    "translations": {
+      "en_US": "Fibers",
+      "nl_NL": "Eiwitten"
+    }
+  },
+  "product.nutritional_values.carbohydratessugars": {
+    "translations": {
+      "en_US": "Sugars",
+      "nl_NL": "Waarvan suiker"
+    }
+  },
+  "product.nutritional_values.carbohydrates": {
+    "translations": {
+      "en_US": "Carbohydrates",
+      "nl_NL": "Koolhydraten"
+    }
+  },
+  "product.nutritional_values.fatssaturated": {
+    "translations": {
+      "en_US": "Saturated fats",
+      "nl_NL": "Verzadigde vetten"
+    }
+  },
+  "product.nutritional_values.fats": {
+    "translations": {
+      "en_US": "Fats",
+      "nl_NL": "Vetten"
+    }
+  },
+  "product.nutritional_values.energykcal": {
+    "translations": {
+      "en_US": "Energy (kcal)",
+      "nl_NL": "Energie (kcal)"
+    }
+  },
+  "product.nutritional_values.content.title": {
+    "translations": {
+      "en_US": "per 100{}",
+      "nl_NL": "per 100{}"
+    }
+  },
+  "product.nutritional_values.description": {
+    "translations": {
+      "en_US": "A list with nutritional values in this product",
+      "nl_NL": "Een lijst met voedingswaarden van dit product"
+    }
+  },
+  "product.nutritional_values.kind.title": {
+    "translations": {
+      "en_US": "Nutritional values",
+      "nl_NL": "Voedingswaarden"
+    }
+  },
+  "product.allergens.contains": {
+    "translations": {
+      "en_US": "Might contain:",
+      "nl_NL": "Kan mogelijk bevatten:"
+    }
+  },
+  "product.allergens.description": {
+    "translations": {
+      "en_US": "This product might contain the following allergens",
+      "nl_NL": "Dit product kan mogelijk de volgende allergenen bevatten"
+    }
+  },
+  "product.allergens.title": {
+    "translations": {
+      "en_US": "Allergens",
+      "nl_NL": "Allergenen"
+    }
+  },
+  "product.ingredients.title": {
+    "translations": {
+      "en_US": "Ingredients",
+      "nl_NL": "Ingrediënten"
+    }
+  },
+  "dialog.devtools.title": {
+    "translations": {
+      "en_US": "Developer tools",
+      "nl_NL": "Developer tools"
+    }
+  },
+  "dialog.favorites.description": {
+    "translations": {
+      "en_US": "View all your favorite products",
+      "nl_NL": "Een lijst met favoriete producten."
+    }
+  },
+  "dialog.favorites.title": {
+    "translations": {
+      "en_US": "My favorites",
+      "nl_NL": "Mijn favorieten"
+    }
+  },
+  "dialog.cart.description": {
+    "translations": {
+      "en_US": "View all products in your cart",
+      "nl_NL": "Bekijk hier de producten in je winkelmandje"
+    }
+  },
+  "dialog.cart.title": {
+    "translations": {
+      "en_US": "Cart",
+      "nl_NL": "Winkelmandje"
+    }
+  },
+  "home.section.visit.heading": {
+    "translations": {
+      "en_US": "Do come by!",
+      "nl_NL": "Kom gerust langs"
+    }
+  },
+  "home.section.team.content": {
+    "translations": {
+      "en_US": "Our staff share a passion for cheese and craftsmanship. With their expertise, enthusiasm, and a smile, they’re happy to help you choose the perfect cheese – for any occasion.",
+      "nl_NL": "Onze medewerkers delen een passie voor kaas en ambacht. Met hun\nvakkennis, enthousiasme en een glimlach helpen ze je graag bij het\nkiezen van de perfecte kaas – voor elke gelegenheid"
+    }
+  },
+  "home.section.team.heading": {
+    "translations": {
+      "en_US": "Our team,\nyour cheesespecialists.",
+      "nl_NL": "Ons team,\njouw kaasspecialisten."
+    }
+  },
+  "home.introduction.view_assortment": {
+    "translations": {
+      "en_US": "View our assortment",
+      "nl_NL": "Bekijk ons assortiment"
+    }
+  },
+  "home.introduction_message": {
+    "translations": {
+      "en_US": "For real cheese lovers",
+      "nl_NL": "Voor de echte kaasliefhebber"
+    }
+  },
+  "legal.cookies.actions.accept.necessary": {
+    "translations": {
+      "en_US": "Only functional",
+      "nl_NL": "Alleen noodzakelijke"
+    }
+  },
+  "legal.cookies.actions.accept.all": {
+    "translations": {
+      "en_US": "Accept all",
+      "nl_NL": "Alles accepteren"
+    }
+  },
+  "legal.cookies.notice.description": {
+    "translations": {
+      "en_US": "We make use of analytical cookies to ensure the most optimal browsing experience.",
+      "nl_NL": "Wij maken gebruik van analytische cookies om ervoor te zorgen dat\njouw ervaring met onze website steeds beter wordt."
+    }
+  },
+  "legal.cookies.notice.title": {
+    "translations": {
+      "en_US": "This website makes use of cookies",
+      "nl_NL": "Deze website maakt gebruik van cookies."
+    }
+  },
+  "legal.alcohol_notice": {
+    "translations": {
+      "en_US": "Not 18? No alcohol.",
+      "nl_NL": "geen 18? geen alcohol."
+    }
+  }
+}

@@ -3,7 +3,7 @@ import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import prettierPlugin from 'eslint-plugin-prettier';
 import unusedImports from 'eslint-plugin-unused-imports';
-import prettierConfig from './prettier.config.js';
+import prettierConfig from './prettier.config';
 import importPlugin from 'eslint-plugin-import';
 
 export default defineConfig([
@@ -46,10 +46,6 @@ export default defineConfig([
       'prefer-template': 2,
       'object-shorthand': ['error', 'always'],
 
-      'no-console': 2,
-
-      'react-hooks/exhaustive-deps': 2,
-      '@next/next/no-img-element': 0,
       '@typescript-eslint/no-explicit-any': 0,
       '@typescript-eslint/no-empty-object-type': 0,
       '@typescript-eslint/no-misused-promises': 0,
@@ -68,12 +64,6 @@ export default defineConfig([
           disallowTypeAnnotations: false,
         },
       ],
-    },
-  },
-  {
-    files: ['*.config.ts', 'bin/**/*.ts'],
-    rules: {
-      'no-console': 0,
     },
   },
 ]);
