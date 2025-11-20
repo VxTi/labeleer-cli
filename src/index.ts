@@ -230,6 +230,11 @@ async function labelFilePathWithFallback(
   initialPath?: string
 ): Promise<string> {
   if (initialPath) {
+    log(
+      chalk.blue(
+        `Using label file at ${chalk.cyan.underline(toRelativePath(initialPath))}`
+      )
+    );
     return initialPath;
   }
   log(chalk.yellow('Unable to locate any label files in your project.'));
