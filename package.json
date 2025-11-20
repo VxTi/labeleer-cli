@@ -1,15 +1,26 @@
 {
-  "name": "labeleer-sync-cli",
+  "name": "labeleer-cli",
   "version": "1.0.0",
   "type": "module",
+  "description": "A CLI tool to synchronize translation labels with Labeleer.",
   "author": "Luca Warmenhoven",
   "license": "ISC",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VxTi/labeleer-cli.git"
+  },
   "scripts": {
     "run": "tsx ./src/index.ts",
-    "build": "",
-    "sync": ""
+    "build": "esbuild ./src/index.ts --bundle --packages=external --minify --platform=node --format=esm --outfile=./dist/index.js",
+    "prepublishOnly": "npm run build"
   },
+  "bin": {
+    "labeleer-cli": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@inquirer/prompts": "^8.0.1",
     "@types/node": "^24.10.1",

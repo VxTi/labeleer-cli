@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { input, password, select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { readdir, readFile } from 'fs/promises';
