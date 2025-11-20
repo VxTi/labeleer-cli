@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { readdir, readFile } from 'fs/promises';
 import { glob } from 'glob';
 import { writeFile } from 'node:fs/promises';
+import ora from 'ora';
 
 /**
  * Represents the configuration required to access a project.
@@ -101,7 +102,7 @@ async function tryFetchLabels(config: ProjectConfiguration): Promise<void> {
     log(chalk.red('No label file format selected. Unable to proceed.'));
     process.exit(1);
   }
-
+  const loader = ora('Retrieving labels...').start();
   const response = await fetch(
     `https://labeleer.com/api/project/${config.projectId}/translations/export?format=${format}`,
     {
@@ -113,8 +114,7 @@ async function tryFetchLabels(config: ProjectConfiguration): Promise<void> {
     }
   );
   if (!response.ok) {
-    log(chalk.red(`Failed to fetch labels: ${response.statusText}`));
-    console.error(`Format: ${format}`, await response.text());
+    loader.fail(chalk.red(`Failed to fetch labels: ${response.statusText}`));
     process.exit(1);
   }
 
@@ -122,7 +122,7 @@ async function tryFetchLabels(config: ProjectConfiguration): Promise<void> {
 
   await writeFile(config.localFilePath, data, { encoding: 'utf-8' });
 
-  log(
+  loader.succeed(
     chalk.blue(
       `Labels have been written to ${chalk.cyan.underline(
         toRelativePath(config.localFilePath)
@@ -162,6 +162,8 @@ async function syncWithRemote(config: ProjectConfiguration): Promise<void> {
     return;
   }
 
+  const loader = ora('Synchronizing with project...').start();
+
   const response = await fetch(
     `https://labeleer.com/api/project/${config.projectId}/translations`,
     {
@@ -175,7 +177,7 @@ async function syncWithRemote(config: ProjectConfiguration): Promise<void> {
   );
 
   if (!response.ok) {
-    log(
+    loader.fail(
       chalk.red(
         `Something went wrong with the synchronization: ${response.statusText}`
       )
@@ -184,7 +186,9 @@ async function syncWithRemote(config: ProjectConfiguration): Promise<void> {
     return;
   }
 
-  log(chalk.green(`Local labels have been synchronized with remote project`));
+  loader.succeed(
+    chalk.green(`Local labels have been synchronized with remote project`)
+  );
 }
 
 function toRelativePath(absolutePath: string): string {
