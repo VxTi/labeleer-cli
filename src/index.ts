@@ -18,9 +18,13 @@ interface ProjectConfiguration {
    * This can be acquired in the `'Settings'` screen under the `'Access Tokens'` section.
    */
   accessToken: string;
+
+  localFilePath: string;
 }
 
-const supportedFileFormats = ['json', 'yaml', 'xml'];
+type PartialConfig = Omit<ProjectConfiguration, 'localFilePath'>;
+
+const supportedFileFormats = ['json', 'yaml', 'xml'] as const;
 const labelFileName = 'labels';
 const globIgnorePatterns = [
   'node_modules',
@@ -39,20 +43,26 @@ const globIgnorePatterns = [
   '__tests__',
 ];
 
+type SupportedFileFormat = (typeof supportedFileFormats)[number];
+
 const theme = undefined;
 
 async function main() {
-  const config: ProjectConfiguration | undefined =
+  const partialConfig: PartialConfig | undefined =
     await tryAcquireProjectConfig();
 
-  if (!config) {
-    log(chalk.yellow('Unable to proceed without project configuration.'));
-    return;
+  if (!partialConfig) {
+    process.exit(0);
   }
 
   const possibleLabelFile = await tryAcquireLabelFile();
 
   const labelFile = await labelFilePathWithFallback(possibleLabelFile);
+
+  const config: ProjectConfiguration = {
+    ...partialConfig,
+    localFilePath: labelFile,
+  };
 
   const action = await select(
     {
@@ -60,6 +70,7 @@ async function main() {
       choices: [
         { name: 'Fetch labels', value: 'fetch' },
         { name: 'Sync to remote', value: 'sync' },
+        { name: 'Cancel', value: 'cancel' },
       ],
       theme,
     },
@@ -68,25 +79,23 @@ async function main() {
 
   switch (action) {
     case 'fetch':
-      await tryFetchLabels(config, labelFile);
+      await tryFetchLabels(config);
       return;
     case 'sync':
-      log(chalk.yellow('Synchronization feature is not implemented yet.'));
+      await syncWithRemote(config);
       return;
-    default:
-      log(chalk.red('Unknown action selected.'));
-      process.exit(1);
+    case 'cancel':
+      log(chalk.yellow('Okay, goodbye.'));
   }
 }
 
 /**
  * Fetches labels from the remote project and writes them to the local label file.
  */
-async function tryFetchLabels(
-  projectConfig: ProjectConfiguration,
-  labelFilePath: string
-): Promise<void> {
-  const format = await tryInferFormatFromFileName(labelFilePath);
+async function tryFetchLabels(config: ProjectConfiguration): Promise<void> {
+  const format = await tryInferOrInquireFormatFromFileName(
+    config.localFilePath
+  );
 
   if (!format) {
     log(chalk.red('No label file format selected. Unable to proceed.'));
@@ -94,11 +103,11 @@ async function tryFetchLabels(
   }
 
   const response = await fetch(
-    `https://labeleer.com/api/project/${projectConfig.projectId}/translations/export?format=${format}`,
+    `https://labeleer.com/api/project/${config.projectId}/translations/export?format=${format}`,
     {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${projectConfig.accessToken}`,
+        Authorization: `Bearer ${config.accessToken}`,
         'Content-Type': 'application/json',
       },
     }
@@ -111,19 +120,81 @@ async function tryFetchLabels(
 
   const data = await response.text();
 
-  await writeFile(labelFilePath, data, { encoding: 'utf-8' });
+  await writeFile(config.localFilePath, data, { encoding: 'utf-8' });
 
   log(
     chalk.blue(
       `Labels have been written to ${chalk.cyan.underline(
-        toRelativePath(labelFilePath)
+        toRelativePath(config.localFilePath)
       )}`
     )
   );
 }
 
+async function syncWithRemote(config: ProjectConfiguration): Promise<void> {
+  const localFileContent: string = await readFile(config.localFilePath, {
+    encoding: 'utf-8',
+  });
+  const fileType: SupportedFileFormat | undefined = inferFileFormatFromFileName(
+    config.localFilePath
+  );
+
+  if (!localFileContent) {
+    log(chalk.red('Unable to read local file content. Aborting.'));
+    return;
+  }
+
+  if (!fileType) {
+    log(
+      chalk.red(
+        'Unable to infer file format from label file name. Sync aborted.'
+      )
+    );
+    return;
+  }
+
+  if (fileType !== 'json') {
+    log(
+      chalk.red(
+        'Unsupported format. Currently, only JSON is supported for remote synchronization.'
+      )
+    );
+    return;
+  }
+
+  const response = await fetch(
+    `https://labeleer.com/api/project/${config.projectId}/translations`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${config.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: `{"entries":${localFileContent}}`,
+    }
+  );
+
+  if (!response.ok) {
+    log(
+      chalk.red(
+        `Something went wrong with the synchronization: ${response.statusText}`
+      )
+    );
+    log(await response.text());
+    return;
+  }
+
+  log(chalk.green(`Local labels have been synchronized with remote project`));
+}
+
 function toRelativePath(absolutePath: string): string {
   return absolutePath.replace(process.cwd(), '.');
+}
+
+function inferFileFormatFromFileName(
+  labelFilePath: string
+): SupportedFileFormat | undefined {
+  return supportedFileFormats.find(ext => labelFilePath.endsWith(`.${ext}`));
 }
 
 /**
@@ -133,12 +204,10 @@ function toRelativePath(absolutePath: string): string {
  * @param labelFilePath - The path to the label file.
  * @returns A Promise that resolves to the inferred or selected file format, or undefined if not selected.
  */
-async function tryInferFormatFromFileName(
+async function tryInferOrInquireFormatFromFileName(
   labelFilePath: string
 ): Promise<string | undefined> {
-  const format = supportedFileFormats.find(ext =>
-    labelFilePath.endsWith(`.${ext}`)
-  );
+  const format = inferFileFormatFromFileName(labelFilePath);
   if (!format) {
     return await select({
       message: 'Select the label file format to fetch:',
@@ -171,7 +240,6 @@ async function labelFilePathWithFallback(
     { clearPromptOnDone: true }
   );
   if (!shouldCreate) {
-    log(chalk.yellow('Exiting without creating a label file.'));
     process.exit(0);
   }
 
@@ -239,9 +307,7 @@ async function tryAcquireLabelFile(): Promise<string | undefined> {
  *
  * @returns A Promise that resolves to the ProjectConfiguration or undefined if not acquired.
  */
-async function tryAcquireProjectConfig(): Promise<
-  ProjectConfiguration | undefined
-> {
+async function tryAcquireProjectConfig(): Promise<PartialConfig | undefined> {
   const envFileExpression = /\.env(\..*)?$/;
   const files = await readdir(process.cwd());
   const dotEnvCandidates: string[] = files.filter(fileName =>
@@ -310,9 +376,7 @@ async function tryDeduceEnvFilePath(
  *
  * @returns A Promise that resolves to the ProjectConfiguration or undefined if not provided.
  */
-async function inquireProjectConfig(): Promise<
-  ProjectConfiguration | undefined
-> {
+async function inquireProjectConfig(): Promise<PartialConfig | undefined> {
   const accessToken = await password(
     {
       message: 'Please enter your project access token:',
@@ -338,7 +402,7 @@ async function inquireProjectConfig(): Promise<
  */
 async function tryReadTokenFromEnv(
   envFilePath: string
-): Promise<ProjectConfiguration | undefined> {
+): Promise<PartialConfig | undefined> {
   const content = await readFile(envFilePath, { encoding: 'utf-8' });
   const accessTokenExpr = /^LABELEER.*TOKEN=['"]?([a-zA-Z0-9_-]+)['"]$/;
   const projectIdExpr = /^LABELEER.*PROJECT_ID=['"]?([a-zA-Z0-9_-]+)['"]$/;
@@ -392,7 +456,7 @@ async function tryReadTokenFromEnv(
 
 main().catch(error => {
   if (error instanceof Error && error.name === 'ExitPromptError') {
-    log(chalk.yellow('Cancelling content synchronization.'));
+    log(chalk.yellow('Goodbye.'));
     process.exit(0);
   }
   console.error(chalk.red('An unexpected error occurred:'), error);
