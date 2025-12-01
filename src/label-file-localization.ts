@@ -26,19 +26,19 @@ const labelFileNames = ['labels'];
 
 export async function labelFilePathWithFallback(
   initialPath?: string
-): Promise<string> {
+): Promise<{ path: string; isNew: boolean }> {
   if (initialPath) {
     log(
       chalk.blue(
-        `Using label file at ${chalk.cyan.underline(toRelativePath(initialPath))}`
+        `Using label file at ${chalk.bgBlack.bold.blueBright.underline(toRelativePath(initialPath))}`
       )
     );
-    return initialPath;
+    return { path: initialPath, isNew: false };
   }
   log(chalk.yellow('Unable to locate any label files in your project.'));
   const shouldCreate = await select(
     {
-      message: 'Would you like to create a new labels file?',
+      message: 'Would you like to create and import a new labels file?',
       choices: [
         { name: 'Yes', value: true },
         { name: 'No', value: false },
@@ -48,6 +48,7 @@ export async function labelFilePathWithFallback(
     { clearPromptOnDone: true }
   );
   if (!shouldCreate) {
+    log(chalk.blue('Okay, goodbye.'));
     process.exit(0);
   }
 
@@ -72,7 +73,7 @@ export async function labelFilePathWithFallback(
       )}`
     )
   );
-  return newLabelFilePath;
+  return { path: newLabelFilePath, isNew: true };
 }
 
 export async function tryAcquireLabelFile(): Promise<string | undefined> {

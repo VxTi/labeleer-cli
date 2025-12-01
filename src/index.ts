@@ -1,15 +1,16 @@
 #!/usr/bin/env node
+import { tryCreateLabel } from '@/create-labelt';
 import {
   labelFilePathWithFallback,
   tryAcquireLabelFile,
 } from '@/label-file-localization';
 import { tryAcquireProjectConfig } from '@/project-settings';
-import { log, theme } from '@/utils';
-import { syncWithRemote } from '@/publish-labels';
-import { tryFetchLabels } from '@/retrieve-labels';
+import { log, theme, UserAction } from '@/utils';
+import { tryPublishLocalLabels } from '@/publish-labels';
+import { tryRetrieveLabels } from '@/retrieve-labels';
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
-import { type PartialConfig, type ProjectConfiguration } from 'labeleer-cli';
+import { type PartialConfig, type ProjectConfig } from 'labeleer-cli';
 
 async function main() {
   console.log(
@@ -24,20 +25,21 @@ async function main() {
 
   const possibleLabelFile = await tryAcquireLabelFile();
 
-  const labelFile = await labelFilePathWithFallback(possibleLabelFile);
+  const { path, isNew } = await labelFilePathWithFallback(possibleLabelFile);
 
-  const config: ProjectConfiguration = {
+  const config: ProjectConfig = {
     ...partialConfig,
-    localFilePath: labelFile,
+    localFilePath: path,
   };
 
   const action = await select(
     {
-      message: 'Select an action to perform:',
+      message: 'What would you like to do?',
       choices: [
-        { name: 'Fetch labels', value: 'fetch' },
-        { name: 'Sync to remote', value: 'sync' },
-        { name: '⨯ Cancel', value: 'cancel' },
+        { name: 'Retrieve', value: UserAction.RETRIEVE },
+        { name: 'Publish', value: UserAction.PUBLISH, disabled: isNew },
+        { name: 'Create New Label', value: UserAction.CREATE },
+        { name: '⨯ Cancel', value: UserAction.CANCEL },
       ],
       theme,
     },
@@ -45,20 +47,23 @@ async function main() {
   );
 
   switch (action) {
-    case 'fetch':
-      await tryFetchLabels(config);
+    case UserAction.RETRIEVE:
+      await tryRetrieveLabels(config);
       return;
-    case 'sync':
-      await syncWithRemote(config);
+    case UserAction.PUBLISH:
+      await tryPublishLocalLabels(config);
       return;
-    case 'cancel':
-      log(chalk.yellow('Okay, goodbye.'));
+    case UserAction.CREATE:
+      await tryCreateLabel(config);
+      return;
+    case UserAction.CANCEL:
+      log(chalk.blue('Okay, goodbye.'));
   }
 }
 
 main().catch(error => {
   if (error instanceof Error && error.name === 'ExitPromptError') {
-    log(chalk.yellow('Goodbye.'));
+    log(chalk.blue('Okay, goodbye.'));
     process.exit(0);
   }
   console.error(chalk.red('An unexpected error occurred:'), error);

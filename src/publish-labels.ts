@@ -2,11 +2,11 @@ import { log } from '@/utils';
 import { inferFileFormatFromFileName, type SupportedFileFormat } from '@/files';
 import chalk from 'chalk';
 import { readFile } from 'fs/promises';
-import type { ProjectConfiguration } from 'labeleer-cli';
+import type { ProjectConfig } from 'labeleer-cli';
 import ora from 'ora';
 
-export async function syncWithRemote(
-  config: ProjectConfiguration
+export async function tryPublishLocalLabels(
+  config: ProjectConfig
 ): Promise<void> {
   const localFileContent: string = await readFile(config.localFilePath, {
     encoding: 'utf-8',

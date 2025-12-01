@@ -2,7 +2,7 @@ declare module 'labeleer-cli' {
   /**
    * Represents the configuration required to access a project.
    */
-  export interface ProjectConfiguration {
+  export interface ProjectConfig {
     /**
      * The unique identifier of the project.
      * This is the segment after `../projects/` in the project URL.
@@ -17,5 +17,13 @@ declare module 'labeleer-cli' {
     localFilePath: string;
   }
 
-  export type PartialConfig = Omit<ProjectConfiguration, 'localFilePath'>;
+  export type PartialConfig = Omit<ProjectConfig, 'localFilePath'>;
+
+  export type LabelFile = {
+    [key: string]: {
+      translations: {
+        [locale: string]: string;
+      };
+    };
+  };
 }

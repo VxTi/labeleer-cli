@@ -15,6 +15,16 @@ import type { PartialConfig } from 'labeleer-cli';
 export async function tryAcquireProjectConfig(): Promise<
   PartialConfig | undefined
 > {
+  const penvSettings = tryExtractConfigFromProcessEnv();
+  if (penvSettings) {
+    log(
+      chalk.blue(
+        'Using project configuration from process environment variables.'
+      )
+    );
+    return penvSettings;
+  }
+
   const envFileExpression = /\.env(\..*)?$/;
   const files = await readdir(process.cwd());
   const dotEnvCandidates: string[] = files.filter(fileName =>
@@ -26,7 +36,7 @@ export async function tryAcquireProjectConfig(): Promise<
     return await inquireProjectConfig();
   }
 
-  const dotEnvPath = await tryDeduceEnvFilePath(dotEnvCandidates);
+  const dotEnvPath = await tryDeduceEnvFilePathFromCandidates(dotEnvCandidates);
 
   if (!dotEnvPath) {
     log(chalk.yellow('No .env file selected.'));
@@ -48,6 +58,12 @@ export async function tryAcquireProjectConfig(): Promise<
     );
     return await inquireProjectConfig();
   }
+
+  log(
+    chalk.blue('Using environment file ') +
+      chalk.bold.underline.bgBlack.blueBright(`${dotEnvPath}`) +
+      chalk.blue(' for project configuration.')
+  );
 
   return projectFromEnv;
 }
@@ -135,13 +151,33 @@ async function tryReadTokenFromEnv(
   return { accessToken, projectId };
 }
 
+function tryExtractConfigFromProcessEnv(): PartialConfig | undefined {
+  let accessToken: string | undefined = undefined;
+  let projectId: string | undefined = undefined;
+
+  for (const key of Object.keys(process.env)) {
+    if (/^LABELEER.*TOKEN$/.test(key) && process.env[key]) {
+      accessToken = process.env[key];
+    }
+    if (/^LABELEER.*PROJECT_ID$/.test(key) && process.env[key]) {
+      projectId = process.env[key];
+    }
+  }
+
+  if (accessToken && projectId) {
+    return { accessToken, projectId };
+  }
+
+  return undefined;
+}
+
 /**
  * Prompts the user to select one of the provided .env file candidates.
  *
  * @param candidates - An array of .env file names to choose from.
  * @returns A Promise that resolves to the selected .env file name or undefined if none selected.
  */
-async function tryDeduceEnvFilePath(
+async function tryDeduceEnvFilePathFromCandidates(
   candidates: string[]
 ): Promise<string | undefined> {
   if (candidates.length === 1) {

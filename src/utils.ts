@@ -3,19 +3,22 @@ import chalk from 'chalk';
 export const theme = {
   prefix: {
     // The "dot" that appears before the question
-    idle: chalk.blue('┃\n┃ ') + chalk.gray('○'),
-    done: chalk.blue('┃\n┃ ') + chalk.green('●'),
+    idle: chalk.blue('┃') + chalk.gray(' |\n') + chalk.gray('○'),
+    done:
+      chalk.blue('┃ ') + chalk.gray('|') + chalk.blue('\n┃ ') + chalk.blue('●'),
   },
   icon: {
-    cursor: `${chalk.blue('┃')} ${chalk.magentaBright('»')}`,
+    cursor: chalk.blueBright('»'),
   },
   style: {
+    disabled: (text: string) => chalk.italic.gray(text),
     // Optional: Style the answer text
-    answer: (text: string) => chalk.gray(text),
+    answer: (text: string) => chalk.white(text),
     // Optional: Style the question message
-    message: (text: string) => text,
+    message: (text: string) => chalk.italic(text),
     // Optional: Remove the default help tip
     defaultAnswer: (text: string) => chalk.gray(`(${text})`),
+    highlight: (text: string) => chalk.blue(text),
   },
 };
 
@@ -25,4 +28,11 @@ export function log(...args: any[]) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     ...args
   );
+}
+
+export const enum UserAction {
+  PUBLISH = 'publish',
+  RETRIEVE = 'retrieve',
+  CREATE = 'create',
+  CANCEL = 'cancel',
 }

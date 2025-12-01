@@ -7,15 +7,13 @@ import {
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { writeFile } from 'fs/promises';
-import type { ProjectConfiguration } from 'labeleer-cli';
+import type { ProjectConfig } from 'labeleer-cli';
 import ora from 'ora';
 
 /**
  * Fetches labels from the remote project and writes them to the local label file.
  */
-export async function tryFetchLabels(
-  config: ProjectConfiguration
-): Promise<void> {
+export async function tryRetrieveLabels(config: ProjectConfig): Promise<void> {
   const format = await tryInferOrInquireFormatFromFileName(
     config.localFilePath
   );
