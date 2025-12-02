@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { tryCreateLabel } from '@/create-labelt';
+import { tryCreateLabel } from '@/create-labels';
 import {
   labelFilePathWithFallback,
   tryAcquireLabelFile,
-} from '@/label-file-localization';
-import { tryAcquireProjectConfig } from '@/project-settings';
-import { log, theme, UserAction } from '@/utils';
-import { tryPublishLocalLabels } from '@/publish-labels';
+}                         from '@/label-file-localization';
+import { tryAcquireProjectConfig }             from '@/project-settings';
+import { exitMessage, log, theme, UserAction } from '@/utils';
+import { tryPublishLocalLabels }               from '@/publish-labels';
 import { tryRetrieveLabels } from '@/retrieve-labels';
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
@@ -57,13 +57,13 @@ async function main() {
       await tryCreateLabel(config);
       return;
     case UserAction.CANCEL:
-      log(chalk.blue('Okay, goodbye.'));
+      exitMessage();
   }
 }
 
 main().catch(error => {
   if (error instanceof Error && error.name === 'ExitPromptError') {
-    log(chalk.blue('Okay, goodbye.'));
+    exitMessage();
     process.exit(0);
   }
   console.error(chalk.red('An unexpected error occurred:'), error);

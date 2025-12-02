@@ -1,4 +1,4 @@
-import { log, theme } from '@/utils';
+import { exitMessage, log, theme }              from '@/utils';
 import { supportedFileFormats, toRelativePath } from '@/files';
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
@@ -48,7 +48,7 @@ export async function labelFilePathWithFallback(
     { clearPromptOnDone: true }
   );
   if (!shouldCreate) {
-    log(chalk.blue('Okay, goodbye.'));
+    exitMessage();
     process.exit(0);
   }
 

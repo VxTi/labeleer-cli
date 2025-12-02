@@ -26,6 +26,7 @@ export async function tryRetrieveLabels(config: ProjectConfig): Promise<void> {
     text: 'Retrieving labels...',
     prefixText: chalk.blue('┃'),
   }).start();
+
   const response = await fetch(
     `https://labeleer.com/api/project/${config.projectId}/translations/export?format=${format}`,
     {

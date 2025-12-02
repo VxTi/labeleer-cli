@@ -3,9 +3,9 @@ import chalk from 'chalk';
 export const theme = {
   prefix: {
     // The "dot" that appears before the question
-    idle: chalk.blue('┃') + chalk.gray(' |\n') + chalk.gray('○'),
+    idle: chalk.blue('┃') + chalk.gray(' |\n') + chalk.blue('┗ ○'),
     done:
-      chalk.blue('┃ ') + chalk.gray('|') + chalk.blue('\n┃ ') + chalk.blue('●'),
+      chalk.blue('┃ ') + chalk.gray('|') + chalk.blue('\n┣ ') + chalk.blue('●'),
   },
   icon: {
     cursor: chalk.blueBright('»'),
@@ -28,6 +28,10 @@ export function log(...args: any[]) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     ...args
   );
+}
+
+export function exitMessage() {
+  log(chalk.blue('Okay, goodbye.'));
 }
 
 export const enum UserAction {
