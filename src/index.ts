@@ -3,10 +3,10 @@ import { tryCreateLabel } from '@/create-labels';
 import {
   labelFilePathWithFallback,
   tryAcquireLabelFile,
-}                         from '@/label-file-localization';
-import { tryAcquireProjectConfig }             from '@/project-settings';
-import { exitMessage, log, theme, UserAction } from '@/utils';
-import { tryPublishLocalLabels }               from '@/publish-labels';
+} from '@/label-file-localization';
+import { tryAcquireProjectConfig } from '@/project-settings';
+import { exitMessage, theme, UserAction } from '@/utils';
+import { tryPublishLocalLabels } from '@/publish-labels';
 import { tryRetrieveLabels } from '@/retrieve-labels';
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';

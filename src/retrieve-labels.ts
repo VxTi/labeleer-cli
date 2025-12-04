@@ -1,10 +1,7 @@
 import { log, theme } from '@/utils';
-import {
-  inferFileFormatFromFileName,
-  supportedFileFormats,
-  toRelativePath,
-} from '@/files';
+import { inferFileFormatFromFileName, toRelativePath } from '@/files';
 import { select } from '@inquirer/prompts';
+import { SupportedFormat } from '@labeleer/models';
 import chalk from 'chalk';
 import { writeFile } from 'fs/promises';
 import type { ProjectConfig } from 'labeleer-cli';
@@ -66,10 +63,11 @@ async function tryInferOrInquireFormatFromFileName(
   labelFilePath: string
 ): Promise<string | undefined> {
   const format = inferFileFormatFromFileName(labelFilePath);
+
   if (!format) {
     return await select({
       message: 'Select the label file format to fetch:',
-      choices: supportedFileFormats.map(format => ({
+      choices: Object.values(SupportedFormat).map(format => ({
         name: format,
         value: format,
       })),

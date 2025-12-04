@@ -24,6 +24,7 @@
   "dependencies": {
     "@inquirer/core": "^11.0.1",
     "@inquirer/prompts": "^8.0.1",
+    "@labeleer/models": "^1.0.3",
     "chalk": "^5.6.2",
     "glob": "^13.0.0",
     "ora": "^9.0.0",
@@ -31,10 +32,9 @@
   },
   "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd",
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "@types/node": "^24.10.1",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
     "esbuild": "^0.27.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
@@ -44,6 +44,7 @@
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.47.0"
   }
 }
