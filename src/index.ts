@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 import { tryCreateLabel } from '@/create-labels';
+import { inquireUserAction, UserAction } from '@/inquire/user-action';
 import {
-  labelFilePathWithFallback,
-  tryAcquireLabelFile,
-} from '@/label-file-localization';
+  extractOrInquireLabelFilePaths,
+  tryFindLabelFiles,
+} from '@/label-file-finder';
 import { tryAcquireProjectConfig } from '@/project-settings';
-import { exitMessage, theme, UserAction } from '@/utils';
+import { exitMessage } from '@/utils';
 import { tryPublishLocalLabels } from '@/publish-labels';
 import { tryRetrieveLabels } from '@/retrieve-labels';
-import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { type PartialConfig, type ProjectConfig } from 'labeleer-cli';
 
@@ -23,28 +23,17 @@ async function main() {
     process.exit(0);
   }
 
-  const possibleLabelFile = await tryAcquireLabelFile();
+  const possibleLabelFiles: string[] = await tryFindLabelFiles();
 
-  const { path, isNew } = await labelFilePathWithFallback(possibleLabelFile);
+  const { path: localFilePath, isNew } =
+    await extractOrInquireLabelFilePaths(possibleLabelFiles);
 
   const config: ProjectConfig = {
     ...partialConfig,
-    localFilePath: path,
+    localFilePath,
   };
 
-  const action = await select(
-    {
-      message: 'What would you like to do?',
-      choices: [
-        { name: 'Retrieve', value: UserAction.RETRIEVE },
-        { name: 'Publish', value: UserAction.PUBLISH, disabled: isNew },
-        { name: 'Create New Label', value: UserAction.CREATE },
-        { name: '⨯ Cancel', value: UserAction.CANCEL },
-      ],
-      theme,
-    },
-    { clearPromptOnDone: true }
-  );
+  const action = await inquireUserAction({ isNew });
 
   switch (action) {
     case UserAction.RETRIEVE:

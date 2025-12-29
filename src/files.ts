@@ -1,4 +1,7 @@
-import { getFormatForExtension, type SupportedFormat } from '@labeleer/models';
+import {
+  getFormatForExtension,
+  type SupportedFormat,
+} from '@labeleer/translation-dataset-transformers';
 
 export function toRelativePath(absolutePath: string): string {
   return absolutePath.replace(process.cwd(), '.');
@@ -11,5 +14,5 @@ export function inferFileFormatFromFileName(
 
   if (!extension) return undefined;
 
-  return getFormatForExtension(extension);
+  return getFormatForExtension(`.${extension}`);
 }

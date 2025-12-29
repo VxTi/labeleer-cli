@@ -1,0 +1,16 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="black" />
+  
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
+        fill="white" font-family="sans-serif" font-weight="bold" font-size="29">
+    Labeleer
+  </text>
+  
+  <g transform="translate(145, 106)">
+    <rect width="25" height="14" rx="7" ry="7" fill="#333333" />
+    <text x="12" y="11" text-anchor="middle"
+          fill="white" font-family="sans-serif" font-weight="bold" font-size="9">
+      CLI
+    </text>
+  </g>
+</svg>

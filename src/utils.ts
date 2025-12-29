@@ -34,9 +34,3 @@ export function exitMessage() {
   log(chalk.blue('Okay, goodbye.'));
 }
 
-export const enum UserAction {
-  PUBLISH = 'publish',
-  RETRIEVE = 'retrieve',
-  CREATE = 'create',
-  CANCEL = 'cancel',
-}
