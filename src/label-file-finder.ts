@@ -1,3 +1,4 @@
+import { getFileNameForFormat } from '@/formatting';
 import { inquireContinuationChoice } from '@/inquire/continuation-choice';
 import {
   SupportedFormat,
@@ -84,27 +85,6 @@ async function handleMissingLabelFiles(): Promise<FileIdentificationResult> {
     )
   );
   return { path: newLabelFilePath, isNew: true };
-}
-
-function getFileNameForFormat(format: SupportedFormat): string {
-  switch (format) {
-    case SupportedFormat.ANDROID_STRINGS:
-      return 'Android Strings (.xml)';
-    case SupportedFormat.APPLE_STRINGS:
-      return 'Apple Strings (.strings)';
-    case SupportedFormat.JSON:
-      return 'JSON (.json)';
-    case SupportedFormat.PO:
-      return 'Gettext PO (.po)';
-    case SupportedFormat.TS:
-      return 'Qt Linguist (.ts)';
-    case SupportedFormat.XLIFF:
-      return 'XLIFF (.xliff)';
-    case SupportedFormat.YAML:
-      return 'YAML (.yaml/.yml)';
-    case SupportedFormat.XCSTRINGS:
-      return 'XCStrings (.xcstrings)';
-  }
 }
 
 /**

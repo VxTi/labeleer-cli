@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { tryInquireProjectSetup } from '@/core/project-setup';
 import { tryCreateLabel } from '@/create-labels';
 import { inquireUserAction, UserAction } from '@/inquire/user-action';
 import {
@@ -16,6 +17,9 @@ async function main() {
   console.log(
     `${chalk.blue('┏━')} ${chalk.bgBlack.bold.whiteBright('Labeleer CLI')}`
   );
+
+  const projectSetup = await tryInquireProjectSetup();
+
   const partialConfig: PartialConfig | undefined =
     await tryAcquireProjectConfig();
 
