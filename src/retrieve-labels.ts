@@ -1,7 +1,7 @@
 import { log, theme } from '@/utils';
 import { inferFileFormatFromFileName, toRelativePath } from '@/files';
 import { select } from '@inquirer/prompts';
-import { SupportedFormat } from '@labeleer/translation-dataset-transformers';
+import { LanguageFileFormat } from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
 import { writeFile } from 'fs/promises';
 import type { ProjectConfig } from 'labeleer-cli';
@@ -11,7 +11,7 @@ import ora from 'ora';
  * Fetches labels from the remote project and writes them to the local label file.
  */
 export async function tryRetrieveLabels(config: ProjectConfig): Promise<void> {
-  const format: SupportedFormat | undefined =
+  const format: LanguageFileFormat | undefined =
     await tryInferOrInquireFormatFromFileName(config.localFilePath);
 
   if (!format) {
@@ -60,14 +60,14 @@ export async function tryRetrieveLabels(config: ProjectConfig): Promise<void> {
  */
 async function tryInferOrInquireFormatFromFileName(
   labelFilePath: string
-): Promise<SupportedFormat | undefined> {
-  const format: SupportedFormat | undefined =
+): Promise<LanguageFileFormat | undefined> {
+  const format: LanguageFileFormat | undefined =
     inferFileFormatFromFileName(labelFilePath);
 
   if (!format) {
     return await select({
       message: 'Select the label file format to fetch:',
-      choices: Object.values(SupportedFormat).map(format => ({
+      choices: Object.values(LanguageFileFormat).map(format => ({
         name: format,
         value: format,
       })),

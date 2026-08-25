@@ -1,19 +1,19 @@
 export interface SuccessResult<TOutput> {
-  success: true;
+  ok: true;
   value: TOutput;
 }
 
 export interface ErrorResult {
-  success: false;
+  ok: false;
   error: string;
 }
 
 export type Result<TOutput> = SuccessResult<TOutput> | ErrorResult;
 
 export function Ok<T>(value: T): SuccessResult<T> {
-  return { success: true, value };
+  return { ok: true, value };
 }
 
 export function Err(error: string): ErrorResult {
-  return { success: false, error };
+  return { ok: false, error };
 }

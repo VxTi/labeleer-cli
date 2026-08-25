@@ -1,22 +1,22 @@
-import { SupportedFormat } from '@labeleer/translation-dataset-transformers';
+import { LanguageFileFormat } from '@labeleer/translation-dataset-transformers';
 
-export function getFileNameForFormat(format: SupportedFormat): string {
+export function getFileNameForFormat(format: LanguageFileFormat): string {
   switch (format) {
-    case SupportedFormat.ANDROID_STRINGS:
+    case LanguageFileFormat.ANDROID_STRINGS:
       return 'Android Strings (.xml)';
-    case SupportedFormat.APPLE_STRINGS:
+    case LanguageFileFormat.APPLE_STRINGS:
       return 'Apple Strings (.strings)';
-    case SupportedFormat.JSON:
+    case LanguageFileFormat.JSON:
       return 'JSON (.json)';
-    case SupportedFormat.PO:
+    case LanguageFileFormat.PO:
       return 'Gettext PO (.po)';
-    case SupportedFormat.TS:
+    case LanguageFileFormat.TS:
       return 'Qt Linguist (.ts)';
-    case SupportedFormat.XLIFF:
+    case LanguageFileFormat.XLIFF:
       return 'XLIFF (.xliff)';
-    case SupportedFormat.YAML:
+    case LanguageFileFormat.YAML:
       return 'YAML (.yaml/.yml)';
-    case SupportedFormat.XCSTRINGS:
+    case LanguageFileFormat.XCSTRINGS:
       return 'XCStrings (.xcstrings)';
   }
 }

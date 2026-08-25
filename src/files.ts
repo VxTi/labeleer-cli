@@ -1,6 +1,6 @@
 import {
   getFormatForExtension,
-  type SupportedFormat,
+  type LanguageFileFormat,
 } from '@labeleer/translation-dataset-transformers';
 
 export function toRelativePath(absolutePath: string): string {
@@ -9,7 +9,7 @@ export function toRelativePath(absolutePath: string): string {
 
 export function inferFileFormatFromFileName(
   labelFilePath: string
-): SupportedFormat | undefined {
+): LanguageFileFormat | undefined {
   const extension = labelFilePath.split('.').pop();
 
   if (!extension) return undefined;

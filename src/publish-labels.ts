@@ -1,4 +1,4 @@
-import { type SupportedFormat } from '@labeleer/models';
+import { type LanguageFileFormat } from '@labeleer/translation-dataset-transformers';
 import { inferFileFormatFromFileName } from '@/files';
 import { log } from '@/utils';
 import chalk from 'chalk';
@@ -12,7 +12,7 @@ export async function tryPublishLocalLabels(
   const localFileContent: string = await readFile(config.localFilePath, {
     encoding: 'utf-8',
   });
-  const fileType: SupportedFormat | undefined = inferFileFormatFromFileName(
+  const fileType: LanguageFileFormat | undefined = inferFileFormatFromFileName(
     config.localFilePath
   );
 

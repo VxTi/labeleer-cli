@@ -1,24 +1,24 @@
 import { Err, Ok, type Result } from '@/core/result';
-import { SupportedFormat } from '@labeleer/translation-dataset-transformers';
+import { LanguageFileFormat } from '@labeleer/translation-dataset-transformers';
 
-type ProjectConfigBase<T extends SupportedFormat> = {
+type ProjectConfigBase<T extends LanguageFileFormat> = {
   type: T;
   basePath: string;
   labelFiles: [string, ...string[]];
 };
 
-export type JsonProjectConfig = ProjectConfigBase<SupportedFormat.JSON>;
-export type YamlProjectConfig = ProjectConfigBase<SupportedFormat.YAML>;
-export type TsProjectConfig = ProjectConfigBase<SupportedFormat.TS>;
-export type PoProjectConfig = ProjectConfigBase<SupportedFormat.PO>;
+export type JsonProjectConfig = ProjectConfigBase<LanguageFileFormat.JSON>;
+export type YamlProjectConfig = ProjectConfigBase<LanguageFileFormat.YAML>;
+export type TsProjectConfig = ProjectConfigBase<LanguageFileFormat.TS>;
+export type PoProjectConfig = ProjectConfigBase<LanguageFileFormat.PO>;
 export type AppleStringsProjectConfig =
-  ProjectConfigBase<SupportedFormat.APPLE_STRINGS>;
+  ProjectConfigBase<LanguageFileFormat.APPLE_STRINGS>;
 export type AndroidStringsProjectConfig =
-  ProjectConfigBase<SupportedFormat.ANDROID_STRINGS>;
+  ProjectConfigBase<LanguageFileFormat.ANDROID_STRINGS>;
 export type XCStringsProjectConfig =
-  ProjectConfigBase<SupportedFormat.XCSTRINGS>;
+  ProjectConfigBase<LanguageFileFormat.XCSTRINGS>;
 
-export type XLIFFProjectConfig = ProjectConfigBase<SupportedFormat.XLIFF>;
+export type XLIFFProjectConfig = ProjectConfigBase<LanguageFileFormat.XLIFF>;
 
 export type ProjectConfig =
   | JsonProjectConfig
@@ -31,13 +31,13 @@ export type ProjectConfig =
   | XCStringsProjectConfig;
 
 export interface ProjectIdentity {
-  type: SupportedFormat;
+  type: LanguageFileFormat;
   projectId: string;
   basePath: string;
 }
 
 const projectIdentityPattern = new RegExp(
-  `^(\w+)::(${Object.values(SupportedFormat).join('|')})@(.*)$`
+  `^(\w+)::(${Object.values(LanguageFileFormat).join('|')})@(.*)$`
 );
 
 export function extractProjectIdentity(
@@ -53,7 +53,7 @@ export function extractProjectIdentity(
   const [, projectId, fmt, basePath] = matches;
 
   return Ok({
-    type: fmt as SupportedFormat,
+    type: fmt as LanguageFileFormat,
     projectId,
     basePath,
   });
@@ -62,7 +62,7 @@ export function extractProjectIdentity(
 export function extractProjectConfigFromEnv(): Result<ProjectConfig> {
   const identity = extractProjectIdentity(process.env.LABELEER_PROJECT);
 
-  if (!identity.success) return identity;
+  if (!identity.ok) return identity;
   const config = identity.value;
 
   return configLookupMap[config.type]?.(config) ?? Err('Not supported');
@@ -70,10 +70,10 @@ export function extractProjectConfigFromEnv(): Result<ProjectConfig> {
 
 type LookupFn = (identity: ProjectIdentity) => Result<ProjectConfig>;
 
-const configLookupMap: Partial<Record<SupportedFormat, LookupFn>> = {
-  [SupportedFormat.JSON]: resolveJsonProjectConfig,
-  [SupportedFormat.XCSTRINGS]: resolveXCStringsProjectConfig,
-  [SupportedFormat.YAML]: resolveYamlProjectConfig,
+const configLookupMap: Partial<Record<LanguageFileFormat, LookupFn>> = {
+  [LanguageFileFormat.JSON]: resolveJsonProjectConfig,
+  [LanguageFileFormat.XCSTRINGS]: resolveXCStringsProjectConfig,
+  [LanguageFileFormat.YAML]: resolveYamlProjectConfig,
 };
 
 function resolveJsonProjectConfig(

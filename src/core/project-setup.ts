@@ -4,7 +4,7 @@ import { theme } from '@/utils';
 import { select } from '@inquirer/prompts';
 import {
   getFileExtensionsFromFormat,
-  SupportedFormat,
+  LanguageFileFormat,
   Locales,
   isBCP47Locale,
   isISO639_1LanguageCode,
@@ -51,7 +51,7 @@ export const LocaleDecoder = z
   });
 
 const ProjectSetupDecoder = z.object({
-  variant: z.enum(SupportedFormat),
+  variant: z.enum(LanguageFileFormat),
   paths: z
     .array(
       z.object({
@@ -81,7 +81,7 @@ export async function getProjectSetup(): Promise<Result<ProjectSetup>> {
 }
 
 export async function createProjectSetup(
-  variant: SupportedFormat,
+  variant: LanguageFileFormat,
   paths: ProjectPathEntry[]
 ): Promise<Result<ProjectSetup>> {
   if (await hasProjectSetupFile()) {
@@ -106,7 +106,7 @@ export async function tryInquireProjectSetup(): Promise<
 > {
   const setup = await getProjectSetup();
 
-  if (setup.success) return setup;
+  if (setup.ok) return setup;
 
   const shouldCreateSetupFile = await select({
     message: 'No project setup found. Would you like to create one?',
@@ -127,7 +127,7 @@ export async function tryInquireProjectSetup(): Promise<
 
   const variant = await select({
     message: 'What kind of project would you like to create?',
-    choices: Object.values(SupportedFormat).map(fmt => ({
+    choices: Object.values(LanguageFileFormat).map(fmt => ({
       name: getFileNameForFormat(fmt),
       value: fmt,
     })),
@@ -140,21 +140,21 @@ export async function tryInquireProjectSetup(): Promise<
 }
 
 async function tryLocaleFilePathsForVariant(
-  format: SupportedFormat
+  format: LanguageFileFormat
 ): Promise<ProjectPathEntry[]> {
   switch (format) {
-    case SupportedFormat.JSON:
-    case SupportedFormat.YAML:
-    case SupportedFormat.XCSTRINGS:
+    case LanguageFileFormat.JSON:
+    case LanguageFileFormat.YAML:
+    case LanguageFileFormat.XCSTRINGS:
       return [await tryFindSingularPath(format)];
-    case SupportedFormat.TS:
+    case LanguageFileFormat.TS:
       return await tryResolveTs();
-    case SupportedFormat.XLIFF:
-    case SupportedFormat.PO:
+    case LanguageFileFormat.XLIFF:
+    case LanguageFileFormat.PO:
       return [];
-    case SupportedFormat.APPLE_STRINGS:
+    case LanguageFileFormat.APPLE_STRINGS:
       return await tryResolveAppleStrings();
-    case SupportedFormat.ANDROID_STRINGS:
+    case LanguageFileFormat.ANDROID_STRINGS:
       return await tryResolveAndroidStrings();
   }
 }
@@ -209,7 +209,7 @@ async function tryResolveTs(): Promise<ProjectPathEntry[]> {
  * Will attempt to resolve the file path for the provided project format
  */
 async function tryFindSingularPath(
-  format: SupportedFormat
+  format: LanguageFileFormat
 ): Promise<ProjectPathEntry> {
   const extensionsPattern = `{${getFileExtensionsFromFormat(format).join(',')}}`;
 

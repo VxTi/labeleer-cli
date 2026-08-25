@@ -20,6 +20,11 @@ async function main() {
 
   const projectSetup = await tryInquireProjectSetup();
 
+  if (!projectSetup.ok || !projectSetup.value) {
+    console.log(chalk.blue('Goodbye.'));
+    return;
+  }
+
   const partialConfig: PartialConfig | undefined =
     await tryAcquireProjectConfig();
 

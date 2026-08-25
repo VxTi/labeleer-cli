@@ -1,8 +1,8 @@
 import { getFileNameForFormat } from '@/formatting';
 import { inquireContinuationChoice } from '@/inquire/continuation-choice';
 import {
-  SupportedFormat,
   getFileExtensionsFromFormat,
+  LanguageFileFormat,
 } from '@labeleer/translation-dataset-transformers';
 import { exitMessage, log, theme } from '@/utils';
 import { toRelativePath } from '@/files';
@@ -61,7 +61,7 @@ async function handleMissingLabelFiles(): Promise<FileIdentificationResult> {
     process.exit(0);
   }
 
-  const supportedFormats = Object.values(SupportedFormat);
+  const supportedFormats = Object.values(LanguageFileFormat);
 
   const format = await select(
     {
@@ -94,7 +94,7 @@ async function handleMissingLabelFiles(): Promise<FileIdentificationResult> {
  * @returns A Promise that resolves to the path of the found label file, or undefined if none found.
  */
 export async function tryFindLabelFiles(): Promise<string[]> {
-  const extensions: string[] = Object.values(SupportedFormat).flatMap(fmt =>
+  const extensions: string[] = Object.values(LanguageFileFormat).flatMap(fmt =>
     getFileExtensionsFromFormat(fmt)
   );
   const labelFileNamesPattern = `{${labelFileNames.join(',')}}`;
