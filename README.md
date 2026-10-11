@@ -4,7 +4,7 @@ This is a command-line tool to synchronize your localization labels between your
 
 ## Getting Started
 
-### 1. Environment Configuration
+### 1. Environment Config
 
 Before you begin, the CLI needs your Labeleer **Project ID** and **Access Token**. There are two ways to provide them:
 
@@ -41,7 +41,7 @@ This will launch an interactive prompt that guides you through the available act
 ## Features
 
 -   **Interactive & User-Friendly**: The CLI provides a step-by-step interactive experience, making it easy to manage your labels.
--   **Automatic Configuration Detection**: Automatically finds and uses your `.env` and `labels` files.
+-   **Automatic Config Detection**: Automatically finds and uses your `.env` and `labels` files.
 -   **Fetch Labels**: Download the latest labels from your Labeleer project and save them to your local file (`labels.json`, `labels.yaml`, or `labels.xml`).
 -   **Sync to Remote**: Upload your local label changes to your Labeleer project. **Note**: This feature currently only supports the `JSON` format.
 -   **File Creation**: If no `labels` file is found, the CLI can create one for you in your desired format.

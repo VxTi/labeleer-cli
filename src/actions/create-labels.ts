@@ -1,39 +1,36 @@
-import { isEmptyArray }             from '@/core/type-utils';
-import makeRequest                  from '@/fetch';
-import { type ProjectConfig }       from '@/types';
+import { entries, fromEntries } from '@/core/type-utils';
+import { updateLocalLabelFile } from '@/project/label-file';
+import { type Config } from '@/project/labeleer-config';
+import { type ProjectConfig } from '@/types';
 import { exitMessage, info, theme } from '@/utils';
-import { input, select }            from '@inquirer/prompts';
-import chalk                        from 'chalk';
-import { readFileSync }             from 'fs';
-import { writeFileSync }            from 'node:fs';
-import ora                          from 'ora';
-import * as z                       from 'zod';
+import { input, select } from '@inquirer/prompts';
+import {
+  defaultTransformerSet,
+  getLocaleName,
+  type Locale,
+  type TranslationDataset,
+  type SerializationOptions,
+} from '@labeleer/translation-dataset-transformers';
+import chalk from 'chalk';
+import { readFile, writeFile } from 'fs/promises';
 
-
-export async function tryCreateLabel(config: ProjectConfig) {
+export async function tryCreateLabel(config: Config) {
   const labelName = await input({
     message: 'Enter the name of the new label:',
     theme,
-    validate: processLabelName,
   });
 
-  if (isEmptyArray(config.locales)) {
-    info(
-      'No languages found in the project. Please add languages before creating labels.'
-    );
-    return;
-  }
+  const localeTranslations = new Map<Locale, string>();
 
-  const localeTranslations = new Map<string, string>();
-
-  for (const localeEntry of config.locales) {
+  for (const locale of config.locales) {
+    const ref = config.referenceLocale === locale;
     const labelValue = await input({
-      message: `Enter the value for locale ${chalk.underline(getLocaleName(localeEntry.locale))}${chalk.reset(localeEntry.isReference ? ' ★' : '')}:`,
+      message: `Enter the value for locale ${chalk.underline(getLocaleName(locale))}${chalk.reset(ref ? ' ★' : '')}:`,
       theme,
-      required: localeEntry.isReference,
+      required: ref,
     });
 
-    localeTranslations.set(localeEntry.locale, labelValue);
+    localeTranslations.set(locale, labelValue);
   }
 
   if (!localeTranslations.size) {
@@ -41,17 +38,15 @@ export async function tryCreateLabel(config: ProjectConfig) {
     return;
   }
 
-  const currentLabelFile = readFileSync(config.localFilePath, 'utf-8');
-  const labelFile = parseLabelFile(currentLabelFile);
+  const dataset = await parseLabelFiles(config);
 
-  labelFile[labelName] = labelFile[labelName] ?? { translations: {} };
-  for (const [locale, translation] of localeTranslations) {
-    labelFile[labelName].translations[locale] = translation;
-  }
+  localeTranslations.entries().forEach(([locale, translation]) => {
+    dataset[labelName] = dataset[labelName] ?? { translations: {} };
+    dataset[labelName].translations[locale] = translation;
+  });
 
   // Write back to the label file
-  const updatedContent = JSON.stringify(labelFile, null, 2);
-  writeFileSync(config.localFilePath, updatedContent, 'utf-8');
+  await updateLocalLabelFile(config, dataset);
   info(chalk.blue(`Label '${labelName}' has been added to the label file.`));
 
   const action = await select(
@@ -73,55 +68,45 @@ export async function tryCreateLabel(config: ProjectConfig) {
   await tryCreateLabel(config);
 }
 
-function parseLabelFile(content: string): LabelFile {
-  return JSON.parse(content) as LabelFile; // Currently only supports JSON.
-}
-
-async function tryFetchLanguages(
+async function parseLabelFiles(
   config: ProjectConfig
-): Promise<LocaleEntry[]> {
-  const loader = ora({
-    text: 'Loading languages from project',
-    spinner: 'star',
-  }).start();
+): Promise<TranslationDataset> {
+  const transformer = defaultTransformerSet.getByFormat(config.labelFileFormat);
+  const options = { referenceLocale: config.referenceLocale };
 
-  const locales = await makeRequest(
-    `/project/${config.projectId}/locale`,
-    'GET',
-    {
-      accessToken: config.accessToken,
-      decoder: languageResponseSchema,
-    }
+  if (typeof config.labelFilePaths === 'string') {
+    const content = await readFile(config.labelFileFormat, 'utf-8');
+
+    return transformer.parse(content, options);
+  }
+
+  const labelFiles = await Promise.all(
+    entries(config.labelFilePaths).map(
+      async ([locale, path]): Promise<[Locale, string]> => [
+        locale,
+        await readFile(path, 'utf-8'),
+      ]
+    )
   );
-  loader.stop();
-  if (!locales?.data) {
-    loader.fail('Failed to load languages from project.');
-    process.exit(1);
-  }
 
-  return locales.data;
+  return transformer.parseAggregate(fromEntries(labelFiles), options);
 }
 
-function processLabelName(label: string): boolean {
-  return label.replace(/\s+/, '.').replace(/[^a-zA-Z0-9._-]+/g, '-') === label;
-}
+async function writeLabelFiles(
+  config: ProjectConfig,
+  dataset: TranslationDataset
+): Promise<void> {
+  const transformer = defaultTransformerSet.getByFormat(config.labelFileFormat);
+  const options: SerializationOptions = {
+    referenceLocale: config.referenceLocale,
+    locales: config.languages.map(l => l.locale),
+  };
 
-export function getLocaleName(locale: string): string {
-  try {
-    const [lang, region] = locale.split(/[_-]/); // support both en_US and en-US formats
-    const languageNames = new Intl.DisplayNames(['en'], { type: 'language' });
-    const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+  const updatedContent = transformer.serialize(dataset, options as never);
 
-    const language: string | undefined = languageNames.of(lang);
-    const regionName: string | undefined = region
-      ? regionNames.of(region)
-      : undefined;
-
-    if (!language) {
-      return locale;
-    }
-    return regionName ? `${language} (${regionName})` : language;
-  } catch {
-    return locale;
-  }
+  await Promise.all(
+    entries(updatedContent).map(([filePath, file]) =>
+      writeFile(filePath, file.content, 'utf-8')
+    )
+  );
 }

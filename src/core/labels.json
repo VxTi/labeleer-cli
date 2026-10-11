@@ -18,5 +18,25 @@
     "translations": {
       "en_US": "⨯ Cancel"
     }
+  },
+  "project.create.format.title": {
+    "translations": {
+      "en_US": "What kind of project would you like to create?"
+    }
+  },
+  "project.create.format.error.alreadyExists": {
+    "translations": {
+      "en_US": "Labels file already exists."
+    }
+  },
+  "project.create.success": {
+    "translations": {
+      "en_US": "Initialized project at {0}"
+    }
+  },
+  "project.locales.failure": {
+    "translations": {
+      "en_US": "Failed to retrieve project languages"
+    }
   }
 }

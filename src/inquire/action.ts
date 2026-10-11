@@ -9,30 +9,25 @@ export const enum Action {
   CANCEL = 'cancel',
 }
 
-interface UserActionOptions {
-  isNew: boolean;
-}
-
-export async function inquireUserAction(
-  options: UserActionOptions
-): Promise<Action> {
-  const { isNew } = options;
+export async function inquireUserAction(): Promise<Action> {
   return await select(
     {
       message: 'What would you like to do?',
       choices: [
-        { name: translate('actions.retrieve'), value: Action.FETCH_LABELS },
         {
-          name: translate('actions.publish'),
-          value: Action.PUBLISH_LABELS,
-          disabled: isNew,
+          name: translate({ label: 'actions.retrieve' }),
+          value: Action.FETCH_LABELS,
         },
         {
-          name: translate('actions.createNew'),
+          name: translate({ label: 'actions.publish' }),
+          value: Action.PUBLISH_LABELS,
+        },
+        {
+          name: translate({ label: 'actions.createNew' }),
           value: Action.CREATE_LABEL,
         },
         {
-          name: translate('actions.cancel'),
+          name: translate({ label: 'actions.cancel' }),
           value: Action.CANCEL,
         },
       ],
