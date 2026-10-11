@@ -1,25 +1,11 @@
-import { type LanguageFileFormat }    from '@labeleer/translation-dataset-transformers';
-import { getTransformerFromFileName } from '@/files';
-import { info }                       from '@/utils';
-import chalk                          from 'chalk';
-import { readFile } from 'fs/promises';
-import type { ProjectConfig } from 'labeleer-cli';
+import { readLocalLabelFiles } from '@/project/label-file';
+import { type Config } from '@/project/labeleer-config';
+import { info } from '@/utils';
+import chalk from 'chalk';
 import ora from 'ora';
 
-export async function tryPublishLocalLabels(
-  config: ProjectConfig
-): Promise<void> {
-  const localFileContent: string = await readFile(config.localFilePath, {
-    encoding: 'utf-8',
-  });
-  if (!localFileContent) {
-    info(chalk.red('Unable to read local file content. Aborting.'));
-    return;
-  }
-
-  const fileType: LanguageFileFormat | undefined = getTransformerFromFileName(
-    config.localFilePath
-  );
+export async function tryPublishLocalLabels(config: Config): Promise<void> {
+  const dataset = await readLocalLabelFiles(config);
 
   if (!fileType) {
     info(

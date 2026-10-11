@@ -1,9 +1,7 @@
 import { getTranslationDataset } from '@/project/dataset';
 import { updateLocalLabelFile } from '@/project/label-file';
 import { type Config } from '@/project/labeleer-config';
-import { isNonEmptyArray } from '@/core/type-utils';
 import { toRelativePath } from '@/files';
-import { getLanguages } from '@/project/locales';
 import chalk from 'chalk';
 import ora from 'ora';
 
@@ -15,17 +13,14 @@ export async function tryRetrieveLabels(config: Config): Promise<void> {
     text: 'Retrieving labels...',
     prefixText: chalk.blue('┃'),
   }).start();
-
-  const [dataset, languages] = await Promise.all([
-    getTranslationDataset(config),
-    getLanguages(config.projectId, config.accessToken),
-  ]);
-  if (!dataset || !isNonEmptyArray(languages)) {
+  const { accessToken, projectId } = config;
+  const dataset = await getTranslationDataset(accessToken, projectId);
+  if (!dataset) {
     loader.fail(chalk.red(`Failed to retrieve labels`));
     process.exit(1);
   }
 
-  await updateLocalLabelFile(config, dataset, languages);
+  await updateLocalLabelFile(config, dataset);
 
   loader.succeed(
     chalk.blue(

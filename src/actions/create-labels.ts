@@ -1,18 +1,15 @@
-import { entries, fromEntries } from '@/core/type-utils';
-import { updateLocalLabelFile } from '@/project/label-file';
+import {
+  readLocalLabelFiles,
+  updateLocalLabelFile,
+} from '@/project/label-file';
 import { type Config } from '@/project/labeleer-config';
-import { type ProjectConfig } from '@/types';
 import { exitMessage, info, theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
 import {
-  defaultTransformerSet,
   getLocaleName,
   type Locale,
-  type TranslationDataset,
-  type SerializationOptions,
 } from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
-import { readFile, writeFile } from 'fs/promises';
 
 export async function tryCreateLabel(config: Config) {
   const labelName = await input({
@@ -38,7 +35,7 @@ export async function tryCreateLabel(config: Config) {
     return;
   }
 
-  const dataset = await parseLabelFiles(config);
+  const dataset = await readLocalLabelFiles(config);
 
   localeTranslations.entries().forEach(([locale, translation]) => {
     dataset[labelName] = dataset[labelName] ?? { translations: {} };
@@ -66,47 +63,4 @@ export async function tryCreateLabel(config: Config) {
   }
 
   await tryCreateLabel(config);
-}
-
-async function parseLabelFiles(
-  config: ProjectConfig
-): Promise<TranslationDataset> {
-  const transformer = defaultTransformerSet.getByFormat(config.labelFileFormat);
-  const options = { referenceLocale: config.referenceLocale };
-
-  if (typeof config.labelFilePaths === 'string') {
-    const content = await readFile(config.labelFileFormat, 'utf-8');
-
-    return transformer.parse(content, options);
-  }
-
-  const labelFiles = await Promise.all(
-    entries(config.labelFilePaths).map(
-      async ([locale, path]): Promise<[Locale, string]> => [
-        locale,
-        await readFile(path, 'utf-8'),
-      ]
-    )
-  );
-
-  return transformer.parseAggregate(fromEntries(labelFiles), options);
-}
-
-async function writeLabelFiles(
-  config: ProjectConfig,
-  dataset: TranslationDataset
-): Promise<void> {
-  const transformer = defaultTransformerSet.getByFormat(config.labelFileFormat);
-  const options: SerializationOptions = {
-    referenceLocale: config.referenceLocale,
-    locales: config.languages.map(l => l.locale),
-  };
-
-  const updatedContent = transformer.serialize(dataset, options as never);
-
-  await Promise.all(
-    entries(updatedContent).map(([filePath, file]) =>
-      writeFile(filePath, file.content, 'utf-8')
-    )
-  );
 }

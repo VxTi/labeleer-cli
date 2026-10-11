@@ -19,11 +19,11 @@ export function keys<TKey extends string>(
 }
 
 export function fromEntries<K extends string, V>(
-  entries: [K, Nullable<V>][]
-): Partial<Record<K, V>>;
-export function fromEntries<K extends string, V>(
   entries: [K, V][]
 ): Record<K, V>;
+export function fromEntries<K extends string, V>(
+  entries: [K, Nullable<V>][]
+): Partial<Record<K, V>>;
 export function fromEntries<K extends string, V>(
   entries: [K, Nullable<V>][]
 ): Partial<Record<K, V>> {

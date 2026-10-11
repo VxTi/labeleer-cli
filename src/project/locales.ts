@@ -1,15 +1,13 @@
-import {
-  isNonEmptyArray,
-  type NonEmptyArray,
-  type Nullable,
-} from '@/core/type-utils';
+import { Err, Ok, type Result } from '@/core/result';
+import { isNonEmptyArray, type NonEmptyArray } from '@/core/type-utils';
 import { labeleer, type LanguageItem } from '@labeleer/api';
 
 export async function getLanguages(
-  projectId: string,
-  accessToken: string
-): Promise<Nullable<NonEmptyArray<LanguageItem>>> {
-  const { data } = await labeleer.project.translations.locales.get({
+  accessToken: string,
+  projectId: string
+): Promise<Result<NonEmptyArray<LanguageItem>>> {
+  const { data, error } = await labeleer.project.translations.locales.get({
+    baseUrl: 'https://labeleer.com',
     query: { projectId },
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -17,6 +15,8 @@ export async function getLanguages(
     },
   });
 
-  if (!isNonEmptyArray(data?.data)) return;
-  return data?.data;
+  if (error || !isNonEmptyArray(data?.data)) {
+    return Err(error?.details ?? 'No locales available');
+  }
+  return Ok(data?.data);
 }

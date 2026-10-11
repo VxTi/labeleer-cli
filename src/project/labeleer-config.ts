@@ -1,9 +1,10 @@
-import { Err, Ok, type Result } from '@/core/result';
+import { Ok, type Result } from '@/core/result';
 import {
   mapConstantArray,
   type NonEmptyArray,
   type Nullable,
 } from '@/core/type-utils';
+import { getTranslationDataset } from '@/project/dataset';
 import { getLanguages } from '@/project/locales';
 import { info, theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
@@ -28,14 +29,15 @@ const configDecoder = z.object({
   format: z.enum(FileFormat),
   paths: z.optional(z.partialRecord(z.enum(Locales), z.string())),
   path: z.optional(z.string()),
-  locales: z.array(z.enum(Locales)),
-  referenceLocale: z.optional(z.enum(Locales)),
+  locales: z.array(z.enum(Locales)).min(1),
+  referenceLocale: z.enum(Locales),
 });
 
 export type Config = z.infer<typeof configDecoder> & {
   accessToken: string;
   configPath: string;
   locales: NonEmptyArray<Locale>;
+  referenceLocale: Locale;
 };
 export type SafeConfig = Omit<Config, 'accessToken'>;
 
@@ -49,7 +51,9 @@ export async function getProjectConfig(
   return await readFile(configPath, 'utf-8')
     .then((content): unknown => JSON.parse(content))
     .then(json => configDecoder.parseAsync(json))
-    .then((parsed): Config => ({ ...parsed, accessToken, configPath }))
+    .then(
+      (parsed): Config => ({ ...parsed, accessToken, configPath }) as Config
+    )
     .catch(() => undefined);
 }
 
@@ -63,8 +67,11 @@ export async function createProjectConfig(
   const configPath = resolve(__dirname, DEFAULT_CONFIG_FILE_NAME);
   const path = resolve(__dirname, fileName);
 
-  const languages = await getLanguages(projectId, accessToken);
-  if (!languages) return Err('Unable to retrieve locales');
+  const languagesRes = await getLanguages(accessToken, projectId);
+  if (!languagesRes.ok) return languagesRes;
+  const languages = languagesRes.value;
+  const translations =
+    (await getTranslationDataset(accessToken, projectId)) ?? {};
 
   const referenceLocale =
     languages.find(locale => locale.is_reference)?.locale ??
@@ -78,7 +85,7 @@ export async function createProjectConfig(
     locales: mapConstantArray(languages, l => l.locale),
     referenceLocale,
   };
-  await writeFile(path, '{}');
+  await writeFile(path, JSON.stringify(translations, null, 2));
   await writeFile(configPath, JSON.stringify(config, null, 2));
 
   return Ok({ ...config, accessToken });
@@ -92,7 +99,7 @@ export async function inquireProjectConfig(
 
   const createNew = await select({
     message:
-      'Unable to locate project settings. Would you like to create a new one?',
+      'Unable to locate project settings file. Would you like to create a new one?',
     choices: [
       { name: 'Yes', value: true },
       { name: 'No', value: false },
