@@ -1,7 +1,7 @@
-import { type LanguageFileFormat } from '@labeleer/translation-dataset-transformers';
-import { inferFileFormatFromFileName } from '@/files';
-import { log } from '@/utils';
-import chalk from 'chalk';
+import { type LanguageFileFormat }    from '@labeleer/translation-dataset-transformers';
+import { getTransformerFromFileName } from '@/files';
+import { info }                       from '@/utils';
+import chalk                          from 'chalk';
 import { readFile } from 'fs/promises';
 import type { ProjectConfig } from 'labeleer-cli';
 import ora from 'ora';
@@ -12,17 +12,17 @@ export async function tryPublishLocalLabels(
   const localFileContent: string = await readFile(config.localFilePath, {
     encoding: 'utf-8',
   });
-  const fileType: LanguageFileFormat | undefined = inferFileFormatFromFileName(
-    config.localFilePath
-  );
-
   if (!localFileContent) {
-    log(chalk.red('Unable to read local file content. Aborting.'));
+    info(chalk.red('Unable to read local file content. Aborting.'));
     return;
   }
 
+  const fileType: LanguageFileFormat | undefined = getTransformerFromFileName(
+    config.localFilePath
+  );
+
   if (!fileType) {
-    log(
+    info(
       chalk.red(
         'Unable to infer file format from label file name. Sync aborted.'
       )
@@ -31,7 +31,7 @@ export async function tryPublishLocalLabels(
   }
 
   if (fileType !== 'json') {
-    log(
+    info(
       chalk.red(
         'Unsupported format. Currently, only JSON is supported for remote synchronization.'
       )
@@ -59,7 +59,7 @@ export async function tryPublishLocalLabels(
         `Something went wrong with the synchronization: ${response.statusText}`
       )
     );
-    log(await response.text());
+    info(await response.text());
     return;
   }
 

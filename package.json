@@ -12,8 +12,10 @@
   },
   "scripts": {
     "run": "tsx ./src/index.ts",
+    "check:types": "tsc --noEmit",
     "build": "esbuild ./src/index.ts --bundle --packages=external --minify --platform=node --format=esm --outfile=./dist/index.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "lint": "eslint \"./src/**/*.ts\" --fix --max-warnings 0 --cache"
   },
   "bin": {
     "labeleer-cli": "./dist/index.js"
@@ -22,11 +24,14 @@
     "dist"
   ],
   "dependencies": {
-    "@labeleer/translation-dataset-transformers": "^2.0.2",
     "@inquirer/core": "^11.0.1",
     "@inquirer/prompts": "^8.0.1",
+    "@labeleer/api": "1.0.0",
+    "@labeleer/translation-dataset-transformers": "^2.2.3",
+    "@types/lodash-es": "^4.17.12",
     "chalk": "^5.6.2",
     "glob": "^13.0.0",
+    "lodash-es": "^4.18.1",
     "ora": "^9.0.0",
     "zod": "^4.1.13"
   },

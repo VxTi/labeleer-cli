@@ -1,34 +1,24 @@
-import makeRequest from '@/fetch';
-import { exitMessage, log, theme } from '@/utils';
-import { input, select } from '@inquirer/prompts';
-import chalk from 'chalk';
-import { readFileSync } from 'fs';
-import { type LabelFile, type ProjectConfig } from 'labeleer-cli';
-import { writeFileSync } from 'node:fs';
-import ora from 'ora';
-import { z } from 'zod';
+import { isEmptyArray }             from '@/core/type-utils';
+import makeRequest                  from '@/fetch';
+import { type ProjectConfig }       from '@/types';
+import { exitMessage, info, theme } from '@/utils';
+import { input, select }            from '@inquirer/prompts';
+import chalk                        from 'chalk';
+import { readFileSync }             from 'fs';
+import { writeFileSync }            from 'node:fs';
+import ora                          from 'ora';
+import * as z                       from 'zod';
 
-const languageResponseSchema = z.object({
-  data: z.array(
-    z.object({
-      locale: z.string(),
-      isReference: z.boolean(),
-    })
-  ),
-});
-
-type LocaleEntry = z.infer<typeof languageResponseSchema>['data'][number];
 
 export async function tryCreateLabel(config: ProjectConfig) {
-  const locales: LocaleEntry[] = await tryFetchLanguages(config);
   const labelName = await input({
     message: 'Enter the name of the new label:',
     theme,
     validate: processLabelName,
   });
 
-  if (!locales || locales.length === 0) {
-    log(
+  if (isEmptyArray(config.locales)) {
+    info(
       'No languages found in the project. Please add languages before creating labels.'
     );
     return;
@@ -36,7 +26,7 @@ export async function tryCreateLabel(config: ProjectConfig) {
 
   const localeTranslations = new Map<string, string>();
 
-  for (const localeEntry of locales) {
+  for (const localeEntry of config.locales) {
     const labelValue = await input({
       message: `Enter the value for locale ${chalk.underline(getLocaleName(localeEntry.locale))}${chalk.reset(localeEntry.isReference ? ' ★' : '')}:`,
       theme,
@@ -47,7 +37,7 @@ export async function tryCreateLabel(config: ProjectConfig) {
   }
 
   if (!localeTranslations.size) {
-    log('No translations provided. Label creation aborted.');
+    info('No translations provided. Label creation aborted.');
     return;
   }
 
@@ -62,7 +52,7 @@ export async function tryCreateLabel(config: ProjectConfig) {
   // Write back to the label file
   const updatedContent = JSON.stringify(labelFile, null, 2);
   writeFileSync(config.localFilePath, updatedContent, 'utf-8');
-  log(chalk.blue(`Label '${labelName}' has been added to the label file.`));
+  info(chalk.blue(`Label '${labelName}' has been added to the label file.`));
 
   const action = await select(
     {

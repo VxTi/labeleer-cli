@@ -1,18 +1,19 @@
-import {
-  getFormatForExtension,
-  type LanguageFileFormat,
-} from '@labeleer/translation-dataset-transformers';
+import { defaultTransformerSet } from '@labeleer/translation-dataset-transformers';
 
 export function toRelativePath(absolutePath: string): string {
   return absolutePath.replace(process.cwd(), '.');
 }
 
-export function inferFileFormatFromFileName(
+export type FileTransformer = ReturnType<
+  typeof defaultTransformerSet.getByExtension
+> & {};
+
+export function getTransformerFromFileName(
   labelFilePath: string
-): LanguageFileFormat | undefined {
+): FileTransformer | undefined {
   const extension = labelFilePath.split('.').pop();
 
   if (!extension) return undefined;
 
-  return getFormatForExtension(`.${extension}`);
+  return defaultTransformerSet.getByExtension(`.${extension}`);
 }

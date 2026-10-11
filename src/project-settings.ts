@@ -1,8 +1,15 @@
-import { log, theme } from '@/utils';
+import {
+  hasArrayLength,
+  isNonEmptyArray,
+  type Nullable,
+} from '@/core/type-utils';
+import { type BasicProjectConfig } from '@/types';
+import { info, theme } from '@/utils';
 import { input, password, select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { readdir, readFile } from 'fs/promises';
-import type { PartialConfig } from 'labeleer-cli';
+import { isNil } from 'lodash-es';
+import { parseEnv } from 'node:util';
 
 /**
  * Attempts to acquire the project configuration by searching for .env files
@@ -12,46 +19,25 @@ import type { PartialConfig } from 'labeleer-cli';
  *
  * @returns A Promise that resolves to the ProjectConfiguration or undefined if not acquired.
  */
-export async function tryAcquireProjectConfig(): Promise<
-  PartialConfig | undefined
+export async function getBasicProjectConfig(): Promise<
+  Nullable<BasicProjectConfig>
 > {
-  const penvSettings = tryExtractConfigFromProcessEnv();
-  if (penvSettings) {
-    log(
-      chalk.blue(
-        'Using project configuration from process environment variables.'
-      )
-    );
-    return penvSettings;
-  }
+  const envPath = await getEnvFilePath();
 
-  const envFileExpression = /\.env(\..*)?$/;
-  const files = await readdir(process.cwd());
-  const dotEnvCandidates: string[] = files.filter(fileName =>
-    envFileExpression.test(fileName)
-  );
-
-  if (!dotEnvCandidates.length) {
-    log(chalk.yellow('Unable to locate any .env files.'));
+  if (!envPath) {
+    info(chalk.yellow('No .env file selected.'));
     return await inquireProjectConfig();
   }
 
-  const dotEnvPath = await tryDeduceEnvFilePathFromCandidates(dotEnvCandidates);
+  const projectFromEnv = await extractProjectConfigFromEnv(envPath);
 
-  if (!dotEnvPath) {
-    log(chalk.yellow('No .env file selected.'));
-    return await inquireProjectConfig();
-  }
-
-  const projectFromEnv = await tryReadTokenFromEnv(dotEnvPath);
-
-  if (!projectFromEnv) {
-    log(
+  if (isNil(projectFromEnv)) {
+    info(
       chalk.yellow(
-        `Unable to locate project configuration from ${chalk.bold.yellowBright(dotEnvPath)}.`
+        `Unable to locate project configuration from ${chalk.bold.yellowBright(envPath)}.`
       )
     );
-    log(
+    info(
       chalk.yellow(
         `Make sure it contains both ${chalk.bold.yellowBright('LABELEER_ACCESS_TOKEN')} and ${chalk.bold.yellowBright('LABELEER_PROJECT_ID')}.`
       )
@@ -59,9 +45,9 @@ export async function tryAcquireProjectConfig(): Promise<
     return await inquireProjectConfig();
   }
 
-  log(
+  info(
     chalk.blue('Using environment file ') +
-      chalk.bold.underline.bgBlack.blueBright(`${dotEnvPath}`) +
+      chalk.bold.underline.bgBlack.blueBright(`${envPath}`) +
       chalk.blue(' for project configuration.')
   );
 
@@ -73,7 +59,7 @@ export async function tryAcquireProjectConfig(): Promise<
  *
  * @returns A Promise that resolves to the ProjectConfiguration or undefined if not provided.
  */
-async function inquireProjectConfig(): Promise<PartialConfig | undefined> {
+async function inquireProjectConfig(): Promise<BasicProjectConfig> {
   const accessToken = await password(
     {
       message: 'Please enter your project access token:',
@@ -97,90 +83,73 @@ async function inquireProjectConfig(): Promise<PartialConfig | undefined> {
  * @param envFilePath - The path to the .env file.
  * @returns A Promise that resolves to the ProjectConfiguration or undefined if not found.
  */
-async function tryReadTokenFromEnv(
+async function extractProjectConfigFromEnv(
   envFilePath: string
-): Promise<PartialConfig | undefined> {
+): Promise<Nullable<BasicProjectConfig>> {
   const content = await readFile(envFilePath, { encoding: 'utf-8' });
-  const accessTokenExpr = /^LABELEER.*TOKEN=['"]?([a-zA-Z0-9_-]+)['"]$/;
-  const projectIdExpr = /^LABELEER.*PROJECT_ID=['"]?([a-zA-Z0-9_-]+)['"]$/;
+  const parsed = parseEnv(content);
 
-  const accessTokenCandidates: string[] = [];
-  const projectIdCandidates: string[] = [];
+  type KeyPair = { key: string; value: string };
 
-  for (const line of content.split('\n')) {
-    const accessTokenMatch = line.match(accessTokenExpr);
-    const projectIdMatch = line.match(projectIdExpr);
+  const accessTokenCandidates: KeyPair[] = [];
+  const projectIdCandidates: KeyPair[] = [];
 
-    if (accessTokenMatch) {
-      accessTokenCandidates.push(accessTokenMatch[1]);
+  Object.entries(parsed).forEach(([key, value]) => {
+    if (!key.includes('LABELEER') || isNil(value)) return; // Skip non-labaeleer-like vars
+
+    if (key.includes('TOKEN') || key.includes('PROJECT')) {
+      accessTokenCandidates.push({ key, value });
     }
-    if (projectIdMatch) {
-      projectIdCandidates.push(projectIdMatch[1]);
-    }
-  }
+  });
 
-  if (!accessTokenCandidates.length || !projectIdCandidates.length) {
+  if (
+    !isNonEmptyArray(accessTokenCandidates) ||
+    !isNonEmptyArray(projectIdCandidates)
+  ) {
     return undefined;
   }
 
-  if (accessTokenCandidates.length === 1 && projectIdCandidates.length === 1) {
-    return {
-      accessToken: accessTokenCandidates[0],
-      projectId: projectIdCandidates[0],
-    };
-  }
+  const accessToken = hasArrayLength(accessTokenCandidates, 1)
+    ? accessTokenCandidates[0].value
+    : await select({
+        message: 'Multiple access tokens found. Please select one:',
+        choices: accessTokenCandidates.map(({ key, value }) => ({
+          name: key,
+          value,
+        })),
+        theme,
+      });
 
-  const accessToken = await select({
-    message: 'Multiple access tokens found. Please select one:',
-    choices: accessTokenCandidates.map(token => ({
-      name: token,
-      value: token,
-    })),
-    theme,
-  });
-
-  const projectId = await select({
-    message: 'Multiple project IDs found. Please select one:',
-    choices: projectIdCandidates.map(id => ({
-      name: id,
-      value: id,
-    })),
-    theme,
-  });
+  const projectId = hasArrayLength(projectIdCandidates, 1)
+    ? projectIdCandidates[0].value
+    : await select({
+        message: 'Multiple project IDs found. Please select one:',
+        choices: projectIdCandidates.map(({ key, value }) => ({
+          name: key,
+          value,
+        })),
+        theme,
+      });
 
   return { accessToken, projectId };
-}
-
-function tryExtractConfigFromProcessEnv(): PartialConfig | undefined {
-  let accessToken: string | undefined = undefined;
-  let projectId: string | undefined = undefined;
-
-  for (const key of Object.keys(process.env)) {
-    if (/^LABELEER.*TOKEN$/.test(key) && process.env[key]) {
-      accessToken = process.env[key];
-    }
-    if (/^LABELEER.*PROJECT_ID$/.test(key) && process.env[key]) {
-      projectId = process.env[key];
-    }
-  }
-
-  if (accessToken && projectId) {
-    return { accessToken, projectId };
-  }
-
-  return undefined;
 }
 
 /**
  * Prompts the user to select one of the provided .env file candidates.
  *
- * @param candidates - An array of .env file names to choose from.
  * @returns A Promise that resolves to the selected .env file name or undefined if none selected.
  */
-async function tryDeduceEnvFilePathFromCandidates(
-  candidates: string[]
-): Promise<string | undefined> {
-  if (candidates.length === 1) {
+async function getEnvFilePath(): Promise<string | undefined> {
+  const envFileExpression = /\.env(\..*)?$/;
+  const files = await readdir(process.cwd());
+  const candidates: string[] = files.filter(fileName =>
+    envFileExpression.test(fileName)
+  );
+  if (!isNonEmptyArray(candidates)) {
+    return undefined;
+  }
+
+  if (hasArrayLength(candidates, 1)) {
     return candidates[0];
   }
 

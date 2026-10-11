@@ -22,7 +22,7 @@ export const theme = {
   },
 };
 
-export function log(...args: any[]) {
+export function info(...args: any[]) {
   console.log(
     chalk.blue('┃ ') + chalk.reset.white('▪'),
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -31,6 +31,5 @@ export function log(...args: any[]) {
 }
 
 export function exitMessage() {
-  log(chalk.blue('Okay, goodbye.'));
+  info(chalk.blue('Okay, goodbye.'));
 }
-

@@ -1,6 +1,6 @@
-import { LanguageFileFormat } from '@labeleer/translation-dataset-transformers';
+import { FileFormat } from '@labeleer/translation-dataset-transformers';
 
-export function getFileNameForFormat(format: LanguageFileFormat): string {
+export function getFileNameForFormat(format: FileFormat): string {
   switch (format) {
     case LanguageFileFormat.ANDROID_STRINGS:
       return 'Android Strings (.xml)';

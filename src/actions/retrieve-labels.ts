@@ -1,21 +1,28 @@
-import { log, theme } from '@/utils';
-import { inferFileFormatFromFileName, toRelativePath } from '@/files';
+import { type ProjectConfig } from '@/types';
+import { info, theme } from '@/utils';
+import {
+  type FileTransformer,
+  getTransformerFromFileName,
+  toRelativePath,
+} from '@/files';
 import { select } from '@inquirer/prompts';
-import { LanguageFileFormat } from '@labeleer/translation-dataset-transformers';
+import {
+  defaultTransformerSet,
+  FileFormat,
+} from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
 import { writeFile } from 'fs/promises';
-import type { ProjectConfig } from 'labeleer-cli';
 import ora from 'ora';
 
 /**
  * Fetches labels from the remote project and writes them to the local label file.
  */
 export async function tryRetrieveLabels(config: ProjectConfig): Promise<void> {
-  const format: LanguageFileFormat | undefined =
+  const format: FileFormat | undefined =
     await tryInferOrInquireFormatFromFileName(config.localFilePath);
 
   if (!format) {
-    log(chalk.red('No label file format selected. Unable to proceed.'));
+    info(chalk.red('No label file format selected. Unable to proceed.'));
     process.exit(1);
   }
   const loader = ora({
@@ -58,21 +65,20 @@ export async function tryRetrieveLabels(config: ProjectConfig): Promise<void> {
  * @param labelFilePath - The path to the label file.
  * @returns A Promise that resolves to the inferred or selected file format, or undefined if not selected.
  */
-async function tryInferOrInquireFormatFromFileName(
-  labelFilePath: string
-): Promise<LanguageFileFormat | undefined> {
-  const format: LanguageFileFormat | undefined =
-    inferFileFormatFromFileName(labelFilePath);
+async function tryInferOrInquireFormatFromFileName(labelFilePath: string) {
+  const transformer: FileTransformer | undefined =
+    getTransformerFromFileName(labelFilePath);
 
-  if (!format) {
-    return await select({
-      message: 'Select the label file format to fetch:',
-      choices: Object.values(LanguageFileFormat).map(format => ({
-        name: format,
-        value: format,
-      })),
-      theme,
-    });
-  }
-  return format;
+  if (transformer) return transformer;
+
+  const format = await select({
+    message: 'Select the label file format to fetch:',
+    choices: Object.values(FileFormat).map(format => ({
+      name: format,
+      value: format,
+    })),
+    theme,
+  });
+
+  return defaultTransformerSet.getByFormat(format);
 }

@@ -1,0 +1,22 @@
+{
+  "actions.retrieve": {
+    "translations": {
+      "en_US": "Retrieve"
+    }
+  },
+  "actions.publish": {
+    "translations": {
+      "en_US": "Publish"
+    }
+  },
+  "actions.createNew": {
+    "translations": {
+      "en_US": "Create new label"
+    }
+  },
+  "actions.cancel": {
+    "translations": {
+      "en_US": "⨯ Cancel"
+    }
+  }
+}
