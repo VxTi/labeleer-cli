@@ -1,43 +1,38 @@
-import { fromEntries, type Nullable } from '@/core/type-utils';
-import { labeleer, type TranslationItem } from '@labeleer/api';
-import type {
-  TranslationDataset,
-  TranslationEntry,
-} from '@labeleer/translation-dataset-transformers';
+import { type Nullable } from '@/core/type-utils';
+import { labeleer } from '@labeleer/api';
+import type { TranslationDataset } from '@labeleer/translation-dataset-transformers';
 
 export async function getTranslationDataset(
   accessToken: string,
   projectId: string
 ): Promise<Nullable<TranslationDataset>> {
-  const items: TranslationItem[] = [];
+  const set: TranslationDataset = {};
 
   const pageSize = 100;
   let offset = 0;
   while (true) {
-    const { data } = await labeleer.project.translations.get({
-      baseUrl: 'https://labeleer.com',
+    const { data, error } = await labeleer.project.translations.get({
       query: { projectId, limit: `${pageSize}`, offset: `${offset}` },
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
-    if (!data?.data) break;
+    if (!data?.data || error) break;
 
     offset += pageSize;
 
-    items.push(...data.data);
-    if (items.length >= data.pagination.totalCount) break;
-  }
-  return fromEntries<string, TranslationEntry>(
-    items.map((item): [string, TranslationEntry] => [
-      item.key,
-      {
+    data.data.forEach(item => {
+      set[item.key] = {
         translations: item.translations,
-        tags: item.tags,
-        description: item.description,
-        plurals: item.plurals,
-      },
-    ])
-  );
+        description: item.description ?? undefined,
+        ...(item.tags.length > 0 && { tags: item.tags }),
+        ...(Object.keys(item.plurals).length > 0 && { plurals: item.plurals }),
+      };
+    });
+
+    if (!data.pagination.has_next) break;
+  }
+
+  return set;
 }

@@ -1,5 +1,7 @@
 import { Ok, type Result } from '@/core/result';
 import {
+  isNonEmptyArray,
+  isNotNil,
   mapConstantArray,
   type NonEmptyArray,
   type Nullable,
@@ -16,20 +18,17 @@ import {
 } from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
 import { readFile, writeFile } from 'fs/promises';
-import { isNil } from 'lodash-es';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import * as path from 'node:path';
 import * as z from 'zod';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const cwd = process.cwd();
 
 const configDecoder = z.object({
   projectId: z.string(),
   format: z.enum(FileFormat),
   paths: z.optional(z.partialRecord(z.enum(Locales), z.string())),
   path: z.optional(z.string()),
-  locales: z.array(z.enum(Locales)).min(1),
+  locales: z.array(z.enum(Locales)).refine(arr => isNonEmptyArray(arr)),
   referenceLocale: z.enum(Locales),
 });
 
@@ -47,13 +46,11 @@ const DEFAULT_LABEL_FILE_NAME = 'labels';
 export async function getProjectConfig(
   accessToken: string
 ): Promise<Nullable<Config>> {
-  const configPath: string = resolve(__dirname, DEFAULT_CONFIG_FILE_NAME);
+  const configPath: string = path.resolve(cwd, DEFAULT_CONFIG_FILE_NAME);
   return await readFile(configPath, 'utf-8')
     .then((content): unknown => JSON.parse(content))
     .then(json => configDecoder.parseAsync(json))
-    .then(
-      (parsed): Config => ({ ...parsed, accessToken, configPath }) as Config
-    )
+    .then((parsed): Config => ({ ...parsed, accessToken, configPath }))
     .catch(() => undefined);
 }
 
@@ -63,9 +60,9 @@ export async function createProjectConfig(
   format: FileFormat
 ): Promise<Result<Config>> {
   const extension = defaultTransformerSet.getByFormat(format).extensions[0];
-  const fileName = `${DEFAULT_LABEL_FILE_NAME}.${extension}`;
-  const configPath = resolve(__dirname, DEFAULT_CONFIG_FILE_NAME);
-  const path = resolve(__dirname, fileName);
+  const fileName = `${DEFAULT_LABEL_FILE_NAME}${extension}`;
+  const configPath = path.resolve(cwd, DEFAULT_CONFIG_FILE_NAME);
+  const labelFilePath = path.resolve(cwd, fileName);
 
   const languagesRes = await getLanguages(accessToken, projectId);
   if (!languagesRes.ok) return languagesRes;
@@ -77,25 +74,25 @@ export async function createProjectConfig(
     languages.find(locale => locale.is_reference)?.locale ??
     languages[0].locale;
 
-  const config: SafeConfig = {
+  const config: Omit<SafeConfig, 'configPath'> = {
     projectId,
     format,
-    configPath,
-    path,
+    path: path.relative(cwd, labelFilePath),
     locales: mapConstantArray(languages, l => l.locale),
     referenceLocale,
   };
-  await writeFile(path, JSON.stringify(translations, null, 2));
+
+  await writeFile(labelFilePath, JSON.stringify(translations, null, 2));
   await writeFile(configPath, JSON.stringify(config, null, 2));
 
-  return Ok({ ...config, accessToken });
+  return Ok({ ...config, configPath, accessToken });
 }
 
 export async function inquireProjectConfig(
   accessToken: string
 ): Promise<Result<Config>> {
   const config = await getProjectConfig(accessToken);
-  if (!isNil(config)) return Ok(config);
+  if (isNotNil(config)) return Ok(config);
 
   const createNew = await select({
     message:

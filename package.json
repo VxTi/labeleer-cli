@@ -11,7 +11,7 @@
     "url": "https://github.com/VxTi/labeleer-cli.git"
   },
   "scripts": {
-    "run": "tsx ./src/index.ts",
+    "start": "tsx ./src/index.ts",
     "check:types": "tsc --noEmit",
     "build": "esbuild ./src/index.ts --bundle --packages=external --minify --platform=node --format=esm --outfile=./dist/index.js",
     "prepublishOnly": "npm run build",
@@ -24,19 +24,17 @@
     "dist"
   ],
   "dependencies": {
+    "@labeleer/api": "1.0.3",
+    "@labeleer/translation-dataset-transformers": "^2.2.3",
     "@inquirer/core": "^11.0.1",
     "@inquirer/prompts": "^8.0.1",
-    "@labeleer/api": "1.0.0",
-    "@labeleer/translation-dataset-transformers": "^2.2.3",
-    "@types/lodash-es": "^4.17.12",
-    "chalk": "^5.6.2",
-    "glob": "^13.0.0",
     "lodash-es": "^4.18.1",
+    "chalk": "^5.6.2",
     "ora": "^9.0.0",
     "zod": "^4.6.6"
   },
-  "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd",
   "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.1",
     "@types/node": "^26.6.5",
@@ -52,5 +50,6 @@
     "typescript": "^6.0.2",
     "typescript7": "npm:typescript@^7.0.2",
     "typescript-eslint": "^8.71.1"
-  }
+  },
+  "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd"
 }

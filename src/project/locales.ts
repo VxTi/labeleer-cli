@@ -7,7 +7,6 @@ export async function getLanguages(
   projectId: string
 ): Promise<Result<NonEmptyArray<LanguageItem>>> {
   const { data, error } = await labeleer.project.translations.locales.get({
-    baseUrl: 'https://labeleer.com',
     query: { projectId },
     headers: {
       Authorization: `Bearer ${accessToken}`,

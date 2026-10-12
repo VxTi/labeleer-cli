@@ -2,41 +2,57 @@
   "actions.retrieve": {
     "translations": {
       "en_US": "Retrieve"
-    }
+    },
+    "tags": [],
+    "plurals": {}
   },
   "actions.publish": {
     "translations": {
       "en_US": "Publish"
-    }
+    },
+    "tags": [],
+    "plurals": {}
   },
   "actions.createNew": {
     "translations": {
       "en_US": "Create new label"
-    }
+    },
+    "tags": [],
+    "plurals": {}
   },
   "actions.cancel": {
     "translations": {
       "en_US": "⨯ Cancel"
-    }
+    },
+    "tags": [],
+    "plurals": {}
   },
   "project.create.format.title": {
     "translations": {
       "en_US": "What kind of project would you like to create?"
-    }
+    },
+    "tags": [],
+    "plurals": {}
   },
   "project.create.format.error.alreadyExists": {
     "translations": {
       "en_US": "Labels file already exists."
-    }
+    },
+    "tags": [],
+    "plurals": {}
   },
   "project.create.success": {
     "translations": {
       "en_US": "Initialized project at {0}"
-    }
+    },
+    "tags": [],
+    "plurals": {}
   },
   "project.locales.failure": {
     "translations": {
       "en_US": "Failed to retrieve project languages"
-    }
+    },
+    "tags": [],
+    "plurals": {}
   }
 }

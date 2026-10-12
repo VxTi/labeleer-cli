@@ -1,2 +1,6 @@
 ignoredBuiltDependencies:
   - esbuild
+
+minimumReleaseAgeExclude:
+  - '@labeleer/api'
+  - '@labeleer/translation-dataset-transformers'

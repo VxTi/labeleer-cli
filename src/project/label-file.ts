@@ -1,12 +1,14 @@
-import { entries, fromEntries } from '@/core/type-utils';
+import { entries } from '@/core/type-utils';
 import { type Config } from '@/project/labeleer-config';
 import {
   defaultTransformerSet,
+  type LanguageFileTransformer,
   type Locale,
   type ParsingOptions,
   type TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 import { readFile, writeFile } from 'fs/promises';
+import fs from 'node:fs';
 
 export async function readLocalLabelFiles(
   config: Config
@@ -15,21 +17,47 @@ export async function readLocalLabelFiles(
   const options: ParsingOptions = { referenceLocale: config.referenceLocale };
 
   if (config.path) {
-    const content = await readFile(config.format, 'utf-8');
-
-    return transformer.parse(content, options as never);
+    return readSingular(transformer, config.path, options);
   }
 
-  const labelFiles = await Promise.all(
-    entries(config.paths ?? {}).map(
-      async ([locale, path]): Promise<[Locale, string]> => [
-        locale,
-        await readFile(path!, 'utf-8'),
-      ]
-    )
+  return readAggregate(transformer, config.paths ?? {}, options);
+}
+
+async function readSingular(
+  transformer: LanguageFileTransformer<any, any, any>,
+  path: string,
+  options: ParsingOptions
+): Promise<TranslationDataset> {
+  return exists(path)
+    .then(() => readFile(path, 'utf-8'))
+    .then(content => transformer.parse(content, options));
+}
+
+async function readAggregate(
+  transformer: LanguageFileTransformer<any, any, any>,
+  paths: Partial<Record<Locale, string>>,
+  options: ParsingOptions
+): Promise<TranslationDataset> {
+  const pairs = entries(paths ?? {}) as [Locale, string][];
+  const missing: Locale[] = [];
+  const labelFiles: Partial<Record<Locale, string>> = {};
+
+  await Promise.all(
+    pairs.map(async ([locale, path]) => {
+      await exists(path)
+        .then(() => readFile(path, 'utf-8'))
+        .then(content => (labelFiles[locale] = content))
+        .catch(() => {
+          missing.push(locale);
+        });
+    })
   );
 
-  return transformer.parseAggregate(fromEntries(labelFiles), options as never);
+  if (missing.length > 0) {
+    throw new Error(`Missing label files for locales: ${missing.join(', ')}`);
+  }
+
+  return transformer.parseAggregate(labelFiles, options);
 }
 
 export async function updateLocalLabelFile(
@@ -47,4 +75,8 @@ export async function updateLocalLabelFile(
       writeFile(path, file.content, { encoding: 'utf-8' })
     )
   );
+}
+
+async function exists(path: string): Promise<boolean> {
+  return fs.promises.access(path, fs.constants.F_OK).then(() => true);
 }
