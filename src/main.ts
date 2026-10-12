@@ -5,8 +5,12 @@ import { inquireProjectConfig } from '@/project/labeleer-config';
 import { exitMessage, info } from '@/utils';
 import { tryPublishLocalLabels } from '@/actions/publish-labels';
 import { tryRetrieveLabels } from '@/actions/retrieve-labels';
+import { parseArgs } from 'node:util';
 import chalk from 'chalk';
-import { parseArgs } from 'util';
+
+process.on('warning', warning => {
+  console.log(warning.stack);
+});
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
