@@ -1,6 +1,7 @@
 import {
   type Plurality,
   type TranslationDataset,
+  type TranslationEntry,
 } from '@labeleer/translation-dataset-transformers';
 import { isNil } from 'lodash-es';
 import translations from './labels.json';
@@ -25,10 +26,10 @@ export function translate({
   plurality,
   args,
 }: InternalTranslationProps): string {
-  const labelEntry = typed[label];
+  const labelEntry = typed[label] as TranslationEntry;
   const locale = defaultLocale;
   const nonPluralized = labelEntry?.translations[locale];
-  const entry: string =
+  const entry: string | undefined =
     (!isNil(plurality)
       ? labelEntry?.plurals?.[locale]?.[plurality]
       : undefined) ?? nonPluralized;

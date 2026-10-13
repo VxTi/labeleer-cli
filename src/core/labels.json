@@ -1,6 +1,6 @@
 {
   "actions.retrieve": {
-    "plurals": {},
+    "plurals": {"en_US": {}},
     "translations": {
       "en_US": "Retrieve"
     },
