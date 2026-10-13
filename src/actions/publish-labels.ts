@@ -1,3 +1,4 @@
+import { translate } from '@/core/i18n';
 import { readLocalLabelFiles } from '@/project/label-file';
 import { type Config } from '@/project/labeleer-config';
 import { info } from '@/utils';
@@ -6,7 +7,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 
 export async function tryPublishLocalLabels(config: Config): Promise<void> {
-  const loader = ora('Synchronizing with project...').start();
+  const loader = ora(translate({ label: 'action.publish.loading' })).start();
   const dataset = await readLocalLabelFiles(config);
 
   const result = await labeleer.project.translations.update({
@@ -20,12 +21,12 @@ export async function tryPublishLocalLabels(config: Config): Promise<void> {
   });
 
   if (!result.data?.success || result.error) {
-    loader.fail(chalk.red(`Something went wrong with the synchronization`));
+    loader.fail(
+      chalk.red(translate({ label: 'actions.publish.loading.failure' }))
+    );
     info(result.error);
     return;
   }
 
-  loader.succeed(
-    chalk.green(`Local labels have been synchronized with remote project`)
-  );
+  loader.succeed(chalk.green(translate({ label: 'actions.publish.success' })));
 }

@@ -122,8 +122,44 @@
     }
   },
   "cli.exitMessage": {
+    "plurals": {},
     "translations": {
       "en_US": "Okay, goodbye."
+    }
+  },
+  "action.publish.loading": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Synchronizing with project..."
+    }
+  },
+  "actions.publish.loading.failure": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Something went wrong whilst synchronizing"
+    }
+  },
+  "actions.publish.success": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Local labels have been synchronized with remote project"
+    }
+  },
+  "actions.retrieve.failure": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Failed to retrieve labels"
+    }
+  },
+  "actions.retrieve.loading": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Retrieving labels..."
+    }
+  },
+  "actions.retrieve.success": {
+    "translations": {
+      "en_US": "Labels have been written to {0}"
     }
   }
 }

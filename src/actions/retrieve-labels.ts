@@ -1,3 +1,4 @@
+import { translate } from '@/core/i18n';
 import { getTranslationDataset } from '@/project/dataset';
 import { updateLocalLabelFile } from '@/project/label-file';
 import { type Config } from '@/project/labeleer-config';
@@ -10,13 +11,13 @@ import ora from 'ora';
  */
 export async function tryRetrieveLabels(config: Config): Promise<void> {
   const loader = ora({
-    text: 'Retrieving labels...',
+    text: translate({ label: 'actions.retrieve.loading' }),
     prefixText: chalk.blue('┃'),
   }).start();
   const { accessToken, projectId } = config;
   const dataset = await getTranslationDataset(accessToken, projectId);
   if (!dataset) {
-    loader.fail(chalk.red(`Failed to retrieve labels`));
+    loader.fail(chalk.red(translate({ label: 'actions.retrieve.failure' })));
     process.exit(1);
   }
 
@@ -24,11 +25,10 @@ export async function tryRetrieveLabels(config: Config): Promise<void> {
 
   loader.succeed(
     chalk.blue(
-      `Labels have been written to ${chalk.cyan.underline(
-        toRelativePath(
-          config.path ?? Object.values(config.paths ?? {}).join(', ')
-        )
-      )}`
+      translate({
+        label: 'actions.retrieve.success',
+        args: [toRelativePath(Object.values(config.paths ?? {}).join(', '))],
+      })
     )
   );
 }
