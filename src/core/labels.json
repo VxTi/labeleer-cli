@@ -1,196 +1,162 @@
 {
-  "actions.retrieve": {
-    "plurals": {
-      "en_US": {}
-    },
-    "translations": {
-      "en_US": "Sync remote changes"
-    }
-  },
-  "actions.publish": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Publish local changes"
-    }
-  },
-  "actions.createNew": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Create new label"
-    }
-  },
-  "actions.cancel": {
-    "plurals": {},
-    "translations": {
-      "en_US": "⨯ Cancel"
-    }
-  },
-  "project.create.format.title": {
-    "plurals": {},
-    "translations": {
-      "en_US": "What kind of project would you like to create?"
-    }
-  },
-  "project.create.format.error.alreadyExists": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Labels file already exists."
-    }
-  },
-  "project.create.success": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Initialized project at {0}"
-    }
-  },
-  "project.locales.failure": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Failed to retrieve project languages"
-    }
-  },
-  "actions.create.success": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Label '{0}' has been added to the label file"
-    }
-  },
-  "actions.title": {
-    "plurals": {},
-    "translations": {
-      "en_US": "What would you like to do?"
-    }
-  },
-  "labels.read.failure": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Missing label files for locales: {0}"
-    }
-  },
-  "cli.title": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Labeleer CLI"
-    }
-  },
-  "action.create.title": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Enter the name of the new label:"
-    }
-  },
-  "action.create.error.tooShort": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Label must be at least {0} characters long"
-    }
-  },
-  "action.create.value": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Enter the value for locale {0}{1}:"
-    }
-  },
-  "action.create.error.empty": {
-    "plurals": {},
-    "translations": {
-      "en_US": "No translations provided. Label creation aborted."
-    }
-  },
   "action.create.additional": {
-    "plurals": {},
     "translations": {
       "en_US": "Would you like to create another one?"
     }
   },
-  "action.create.additional.yes": {
-    "plurals": {},
-    "translations": {
-      "en_US": "Yes"
-    }
-  },
   "action.create.additional.no": {
-    "plurals": {},
     "translations": {
       "en_US": "No"
     }
   },
-  "cli.exitMessage": {
-    "plurals": {},
+  "action.create.additional.yes": {
     "translations": {
-      "en_US": "Okay, goodbye."
+      "en_US": "Yes"
+    }
+  },
+  "action.create.error.empty": {
+    "translations": {
+      "en_US": "No translations provided. Label creation aborted."
+    }
+  },
+  "action.create.error.tooShort": {
+    "translations": {
+      "en_US": "Label must be at least {0} characters long"
+    }
+  },
+  "action.create.title": {
+    "translations": {
+      "en_US": "Enter the name of the new label:"
+    }
+  },
+  "action.create.value": {
+    "translations": {
+      "en_US": "Enter the value for locale {0}{1}:"
     }
   },
   "action.publish.loading": {
-    "plurals": {},
     "translations": {
       "en_US": "Synchronizing with project..."
     }
   },
+  "actions.cancel": {
+    "translations": {
+      "en_US": "⨯ Cancel"
+    }
+  },
+  "actions.create.success": {
+    "translations": {
+      "en_US": "Label '{0}' has been added to the label file"
+    }
+  },
+  "actions.create.sync": {
+    "translations": {
+      "en_US": "Publishing label..."
+    }
+  },
+  "actions.create.sync.failure": {
+    "translations": {
+      "en_US": "Failed to publish label to Labeleer."
+    }
+  },
+  "actions.createNew": {
+    "translations": {
+      "en_US": "Create new label"
+    }
+  },
+  "actions.project.create.configPath": {
+    "translations": {
+      "en_US": "Enter the relative path to the config file:"
+    }
+  },
+  "actions.publish": {
+    "translations": {
+      "en_US": "Publish local changes"
+    }
+  },
   "actions.publish.loading.failure": {
-    "plurals": {},
     "translations": {
       "en_US": "Something went wrong whilst synchronizing"
     }
   },
   "actions.publish.success": {
-    "plurals": {},
     "translations": {
       "en_US": "Local labels have been published to Labeleer"
     }
   },
+  "actions.retrieve": {
+    "translations": {
+      "en_US": "Sync remote changes"
+    }
+  },
   "actions.retrieve.failure": {
-    "plurals": {},
     "translations": {
       "en_US": "Failed to retrieve labels"
     }
   },
   "actions.retrieve.loading": {
-    "plurals": {},
     "translations": {
       "en_US": "Retrieving labels..."
     }
   },
   "actions.retrieve.success": {
-    "plurals": {},
     "translations": {
       "en_US": "Labels have been written to {0}"
     }
   },
-  "actions.project.create.configPath": {
-    "plurals": {},
+  "actions.title": {
     "translations": {
-      "en_US": "Enter the relative path to the config file:"
+      "en_US": "What would you like to do?"
     }
   },
-  "project.load.error.format": {
-    "plurals": {},
+  "cli.exitMessage": {
     "translations": {
-      "en_US": "The config file seems to be corrupt."
+      "en_US": "Okay, goodbye."
     }
   },
-  "project.inquire.id": {
-    "plurals": {},
+  "cli.title": {
     "translations": {
-      "en_US": "Please enter your project ID"
+      "en_US": "Labeleer CLI"
+    }
+  },
+  "labels.read.failure": {
+    "translations": {
+      "en_US": "Missing label files for locales: {0}"
+    }
+  },
+  "project.create.format.error.alreadyExists": {
+    "translations": {
+      "en_US": "Labels file already exists."
+    }
+  },
+  "project.create.format.title": {
+    "translations": {
+      "en_US": "What kind of project would you like to create?"
+    }
+  },
+  "project.create.success": {
+    "translations": {
+      "en_US": "Initialized project at {0}"
     }
   },
   "project.inquire.format": {
-    "plurals": {},
     "translations": {
       "en_US": "Select the label file format to fetch:"
     }
   },
-  "actions.create.sync.failure": {
-    "plurals": {},
+  "project.inquire.id": {
     "translations": {
-      "en_US": "Failed to publish label to Labeleer."
+      "en_US": "Please enter your project ID"
     }
   },
-  "actions.create.sync": {
-    "plurals": {},
+  "project.load.error.format": {
     "translations": {
-      "en_US": "Publishing label..."
+      "en_US": "The config file seems to be corrupt."
+    }
+  },
+  "project.locales.failure": {
+    "translations": {
+      "en_US": "Failed to retrieve project languages"
     }
   }
 }

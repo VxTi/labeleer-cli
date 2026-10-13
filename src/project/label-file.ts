@@ -57,8 +57,11 @@ export async function updateLocalLabelFile(
   config: Config,
   dataset: TranslationDataset
 ): Promise<void> {
+  const sortedDataset = Object.fromEntries(
+    Object.entries(dataset).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+  );
   const transformer = defaultTransformerSet.getByFormat(config.format);
-  const serialized = transformer.serialize(dataset, {
+  const serialized = transformer.serialize(sortedDataset, {
     referenceLocale: config.referenceLocale,
     locales: config.locales,
   });
