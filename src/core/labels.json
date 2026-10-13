@@ -119,11 +119,6 @@
       "en_US": "Labeleer CLI"
     }
   },
-  "labels.read.failure": {
-    "translations": {
-      "en_US": "Missing label files for locales: {0}"
-    }
-  },
   "project.create.format.error.alreadyExists": {
     "translations": {
       "en_US": "Labels file already exists."
@@ -132,11 +127,6 @@
   "project.create.format.title": {
     "translations": {
       "en_US": "What kind of project would you like to create?"
-    }
-  },
-  "project.create.success": {
-    "translations": {
-      "en_US": "Initialized project at {0}"
     }
   },
   "project.inquire.format": {

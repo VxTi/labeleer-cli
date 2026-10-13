@@ -24,7 +24,10 @@ export async function tryCreateLabel(config: Config) {
     theme,
     validate: v =>
       v.length < MIN_TRANSLATION_KEY_LENGTH
-        ? translate({ label: 'action.create.error.tooShort' })
+        ? translate({
+            label: 'action.create.error.tooShort',
+            args: [MIN_TRANSLATION_KEY_LENGTH],
+          })
         : true,
   });
 
@@ -63,7 +66,7 @@ export async function tryCreateLabel(config: Config) {
   const dataset = await readLocalLabelFiles(config);
 
   localeTranslations.entries().forEach(([locale, translation]) => {
-    dataset[labelName] = dataset[labelName] ?? { translations: {} };
+    dataset[labelName] ??= { translations: {} };
     dataset[labelName].translations[locale] = translation;
   });
 
