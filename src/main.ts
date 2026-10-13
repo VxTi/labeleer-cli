@@ -1,4 +1,5 @@
 import { tryCreateLabel } from '@/actions/create-labels';
+import { translate } from '@/core/i18n';
 import { resolveAccessToken } from '@/project/access-token';
 import { inquireUserAction, Action } from '@/inquire/action';
 import { inquireProjectConfig } from '@/project/labeleer-config';
@@ -20,7 +21,7 @@ async function main(): Promise<void> {
     },
   });
   console.log(
-    `${chalk.blue('┏━')} ${chalk.bgBlack.bold.whiteBright('Labeleer CLI')}`
+    `${chalk.blue('┏━')} ${chalk.bgBlack.bold.whiteBright(translate({ label: 'cli.title' }))}`
   );
 
   const accessTokenRes = await resolveAccessToken(values.accessToken);

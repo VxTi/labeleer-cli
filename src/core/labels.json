@@ -68,8 +68,14 @@
     }
   },
   "labels.read.failure": {
+    "plurals": {},
     "translations": {
       "en_US": "Missing label files for locales: {0}"
+    }
+  },
+  "cli.title": {
+    "translations": {
+      "en_US": "Labeleer CLI"
     }
   }
 }

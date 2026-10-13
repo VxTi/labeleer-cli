@@ -1,51 +1,27 @@
 import { readLocalLabelFiles } from '@/project/label-file';
 import { type Config } from '@/project/labeleer-config';
 import { info } from '@/utils';
+import { labeleer } from '@labeleer/api';
 import chalk from 'chalk';
 import ora from 'ora';
 
 export async function tryPublishLocalLabels(config: Config): Promise<void> {
+  const loader = ora('Synchronizing with project...').start();
   const dataset = await readLocalLabelFiles(config);
 
-  if (!fileType) {
-    info(
-      chalk.red(
-        'Unable to infer file format from label file name. Sync aborted.'
-      )
-    );
-    return;
-  }
+  const result = await labeleer.project.translations.update({
+    headers: {
+      Authorization: `Bearer ${config.accessToken}`,
+    },
+    body: {
+      projectId: config.projectId,
+      entries: dataset,
+    },
+  });
 
-  if (fileType !== 'json') {
-    info(
-      chalk.red(
-        'Unsupported format. Currently, only JSON is supported for remote synchronization.'
-      )
-    );
-    return;
-  }
-
-  const loader = ora('Synchronizing with project...').start();
-
-  const response = await fetch(
-    `https://labeleer.com/api/project/${config.projectId}/translations`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${config.accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: `{"entries":${localFileContent}}`,
-    }
-  );
-
-  if (!response.ok) {
-    loader.fail(
-      chalk.red(
-        `Something went wrong with the synchronization: ${response.statusText}`
-      )
-    );
-    info(await response.text());
+  if (!result.data?.success || result.error) {
+    loader.fail(chalk.red(`Something went wrong with the synchronization`));
+    info(result.error);
     return;
   }
 

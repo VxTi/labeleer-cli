@@ -55,7 +55,10 @@ export async function tryCreateLabel(config: Config) {
   await updateLocalLabelFile(config, dataset);
   info(
     chalk.blue(
-      translate({ label: 'actions.create.success', args: [labelName] })
+      translate({
+        label: 'actions.create.success',
+        args: [chalk.underline(labelName)],
+      })
     )
   );
 
