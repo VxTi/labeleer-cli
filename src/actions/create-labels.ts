@@ -1,5 +1,5 @@
 import { translate } from '@/core/i18n';
-import { Ok, type Result } from '@/core/result';
+import { Err, Ok, type Result } from '@/core/result';
 import {
   readLocalLabelFiles,
   updateLocalLabelFile,
@@ -15,6 +15,7 @@ import {
   type TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
+import { thru } from 'lodash-es';
 import ora from 'ora';
 
 export async function tryCreateLabel(config: Config) {
@@ -40,10 +41,18 @@ export async function tryCreateLabel(config: Config) {
         ],
       }),
       theme,
+      validate: v =>
+        thru(v.trim(), trimmed =>
+          ref && trimmed.length === 0
+            ? 'Reference language is required to have a translation'
+            : true
+        ),
       required: ref,
     });
 
-    localeTranslations.set(locale, labelValue);
+    if (labelValue.trim().length > 0) {
+      localeTranslations.set(locale, labelValue);
+    }
   }
 
   if (!localeTranslations.size) {
@@ -69,7 +78,9 @@ export async function tryCreateLabel(config: Config) {
     )
   );
 
-  const publishLoader = ora({}).start();
+  const publishLoader = ora(
+    translate({ label: 'actions.create.sync' })
+  ).start();
   const publishResult = await publishToLabeleer(
     config,
     labelName,
@@ -78,7 +89,12 @@ export async function tryCreateLabel(config: Config) {
   if (publishResult.ok) {
     publishLoader.stop();
   } else {
-    publishLoader.fail('Failed to synchronize with Labeleer. Try again later');
+    publishLoader.stopAndPersist({
+      symbol: chalk.blue('┃'),
+      text: chalk.red(
+        `✖ ${translate({ label: 'actions.create.sync.failure' })}`
+      ),
+    });
   }
 
   const action = await select(
@@ -110,7 +126,7 @@ async function publishToLabeleer(
   config: Config,
   labelName: string,
   map: Map<Locale, string>
-): Promise<Result<boolean>> {
+): Promise<Result<undefined, undefined>> {
   const dataset: TranslationDataset = {};
   map.forEach((translation, locale) => {
     dataset[labelName] = dataset[labelName] ?? { translations: {} };
@@ -126,7 +142,7 @@ async function publishToLabeleer(
     },
   });
 
-  if (result.data?.success) return Ok(true);
+  if (result.data?.success) return Ok(undefined);
 
-  return Ok(false);
+  return Err(undefined);
 }

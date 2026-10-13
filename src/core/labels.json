@@ -184,8 +184,21 @@
     }
   },
   "project.inquire.format": {
+    "plurals": {},
     "translations": {
       "en_US": "Select the label file format to fetch:"
+    }
+  },
+  "actions.create.sync.failure": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Failed to publish label to Labeleer."
+    }
+  },
+  "actions.create.sync": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Publishing label..."
     }
   }
 }
