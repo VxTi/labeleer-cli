@@ -1,6 +1,8 @@
 {
   "actions.retrieve": {
-    "plurals": {"en_US": {}},
+    "plurals": {
+      "en_US": {}
+    },
     "translations": {
       "en_US": "Retrieve"
     },
@@ -158,8 +160,32 @@
     }
   },
   "actions.retrieve.success": {
+    "plurals": {},
     "translations": {
       "en_US": "Labels have been written to {0}"
+    }
+  },
+  "actions.project.create.configPath": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Enter the relative path to the config file:"
+    }
+  },
+  "project.load.error.format": {
+    "plurals": {},
+    "translations": {
+      "en_US": "The config file seems to be corrupt."
+    }
+  },
+  "project.inquire.id": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Please enter your project ID"
+    }
+  },
+  "project.inquire.format": {
+    "translations": {
+      "en_US": "Select the label file format to fetch:"
     }
   }
 }

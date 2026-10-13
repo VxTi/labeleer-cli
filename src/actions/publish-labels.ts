@@ -1,7 +1,7 @@
 import { translate } from '@/core/i18n';
 import { readLocalLabelFiles } from '@/project/label-file';
-import { type Config } from '@/project/labeleer-config';
-import { info } from '@/utils';
+import { type Config }         from '@/project/config';
+import { info }                from '@/utils';
 import { labeleer } from '@labeleer/api';
 import chalk from 'chalk';
 import ora from 'ora';

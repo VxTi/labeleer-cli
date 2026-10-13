@@ -3,6 +3,5 @@
   "format": "json",
   "rootDir": "./src/core",
   "paths": { "en_US": "labels.json" },
-  "locales": ["en_US"],
   "referenceLocale": "en_US"
 }

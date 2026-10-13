@@ -1,15 +1,16 @@
-import { type Nullable } from '@/core/type-utils';
+import { Err, Ok, type Result } from '@/core/result';
 import { labeleer } from '@labeleer/api';
 import type { TranslationDataset } from '@labeleer/translation-dataset-transformers';
 
 export async function getTranslationDataset(
   accessToken: string,
   projectId: string
-): Promise<Nullable<TranslationDataset>> {
+): Promise<Result<TranslationDataset>> {
   const set: TranslationDataset = {};
 
   const pageSize = 100;
   let offset = 0;
+
   while (true) {
     const { data, error } = await labeleer.project.translations.get({
       query: { projectId, limit: `${pageSize}`, offset: `${offset}` },
@@ -18,7 +19,9 @@ export async function getTranslationDataset(
         'Content-Type': 'application/json',
       },
     });
-    if (!data?.data || error) break;
+    if (error) {
+      return Err(error.error);
+    }
 
     offset += pageSize;
 
@@ -34,5 +37,5 @@ export async function getTranslationDataset(
     if (!data.pagination.has_next) break;
   }
 
-  return set;
+  return Ok(set);
 }

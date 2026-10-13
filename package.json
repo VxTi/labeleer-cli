@@ -15,7 +15,8 @@
     "check:types": "tsc --noEmit",
     "build": "esbuild ./src/index.ts --bundle --packages=external --minify --platform=node --format=esm --outfile=./dist/index.js",
     "prepublishOnly": "npm run build",
-    "lint": "eslint \"./src/**/*.ts\" --fix --max-warnings 0 --cache"
+    "lint": "eslint \"./src/**/*.ts\" --fix --max-warnings 0 --cache",
+    "create:schema": "tsx ./bin/create-project-config-json-schema.ts"
   },
   "bin": {
     "labeleer-cli": "./dist/index.js"

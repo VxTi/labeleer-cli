@@ -3,8 +3,8 @@ import { Ok, type Result } from '@/core/result';
 import {
   readLocalLabelFiles,
   updateLocalLabelFile,
-} from '@/project/label-file';
-import { type Config } from '@/project/labeleer-config';
+}                                   from '@/project/label-file';
+import { type Config }              from '@/project/config';
 import { exitMessage, info, theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
 import { labeleer } from '@labeleer/api';

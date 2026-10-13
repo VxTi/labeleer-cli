@@ -1,20 +1,16 @@
-import { entries } from '@/core/type-utils';
-import {
-  type AbsolutePath,
-  type Config,
-  type RelativePath,
-} from '@/project/labeleer-config';
+import { entries }                                 from '@/core/type-utils';
+import type { AbsolutePath, Config, RelativePath } from './config';
 import {
   defaultTransformerSet,
   type LanguageFileTransformer,
   type Locale,
   type ParsingOptions,
   type TranslationDataset,
-} from '@labeleer/translation-dataset-transformers';
+}                                                  from '@labeleer/translation-dataset-transformers';
 import { readFile, writeFile } from 'fs/promises';
-import { thru } from 'lodash-es';
 import fs from 'node:fs';
-import * as path from 'node:path';
+import path from 'node:path';
+import { thru } from 'lodash-es';
 
 export async function readLocalLabelFiles(
   config: Config
@@ -71,9 +67,7 @@ export async function updateLocalLabelFile(
     entries(serialized).map(([path, file]) =>
       thru(resolvePath(config, path), absolutePath =>
         exists(absolutePath).then(() =>
-          writeFile(resolvePath(config, path), file.content, {
-            encoding: 'utf-8',
-          })
+          writeFile(absolutePath, file.content, { encoding: 'utf-8' })
         )
       )
     )

@@ -1,7 +1,7 @@
 import { translate } from '@/core/i18n';
 import { getTranslationDataset } from '@/project/dataset';
 import { updateLocalLabelFile } from '@/project/label-file';
-import { type Config } from '@/project/labeleer-config';
+import { type Config } from '@/project/config';
 import { toRelativePath } from '@/files';
 import chalk from 'chalk';
 import ora from 'ora';
@@ -15,13 +15,13 @@ export async function tryRetrieveLabels(config: Config): Promise<void> {
     prefixText: chalk.blue('┃'),
   }).start();
   const { accessToken, projectId } = config;
-  const dataset = await getTranslationDataset(accessToken, projectId);
-  if (!dataset) {
+  const result = await getTranslationDataset(accessToken, projectId);
+  if (!result.ok) {
     loader.fail(chalk.red(translate({ label: 'actions.retrieve.failure' })));
     process.exit(1);
   }
 
-  await updateLocalLabelFile(config, dataset);
+  await updateLocalLabelFile(config, result.value);
 
   loader.succeed(
     chalk.blue(
