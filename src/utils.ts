@@ -1,3 +1,4 @@
+import { translate } from '@/core/i18n';
 import chalk from 'chalk';
 
 export const theme = {
@@ -31,5 +32,5 @@ export function info(...args: any[]) {
 }
 
 export function exitMessage() {
-  info(chalk.blue('Okay, goodbye.'));
+  info(chalk.blue(translate({ label: 'cli.exitMessage' })));
 }

@@ -74,8 +74,56 @@
     }
   },
   "cli.title": {
+    "plurals": {},
     "translations": {
       "en_US": "Labeleer CLI"
+    }
+  },
+  "action.create.title": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Enter the name of the new label:"
+    }
+  },
+  "action.create.error.tooShort": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Label must be at least {0} characters long"
+    }
+  },
+  "action.create.value": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Enter the value for locale {0}{1}:"
+    }
+  },
+  "action.create.error.empty": {
+    "plurals": {},
+    "translations": {
+      "en_US": "No translations provided. Label creation aborted."
+    }
+  },
+  "action.create.additional": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Would you like to create another one?"
+    }
+  },
+  "action.create.additional.yes": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Yes"
+    }
+  },
+  "action.create.additional.no": {
+    "plurals": {},
+    "translations": {
+      "en_US": "No"
+    }
+  },
+  "cli.exitMessage": {
+    "translations": {
+      "en_US": "Okay, goodbye."
     }
   }
 }

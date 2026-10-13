@@ -15,16 +15,16 @@ export async function inquireUserAction(): Promise<Action> {
       message: translate({ label: 'actions.title' }),
       choices: [
         {
-          name: translate({ label: 'actions.retrieve' }),
-          value: Action.FETCH_LABELS,
+          name: translate({ label: 'actions.createNew' }),
+          value: Action.CREATE_LABEL,
         },
         {
           name: translate({ label: 'actions.publish' }),
           value: Action.PUBLISH_LABELS,
         },
         {
-          name: translate({ label: 'actions.createNew' }),
-          value: Action.CREATE_LABEL,
+          name: translate({ label: 'actions.retrieve' }),
+          value: Action.FETCH_LABELS,
         },
         {
           name: translate({ label: 'actions.cancel' }),

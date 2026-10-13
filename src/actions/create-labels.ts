@@ -18,11 +18,11 @@ import chalk from 'chalk';
 
 export async function tryCreateLabel(config: Config) {
   const labelName = await input({
-    message: 'Enter the name of the new label:',
+    message: translate({ label: 'action.create.title' }),
     theme,
     validate: v =>
       v.length < MIN_TRANSLATION_KEY_LENGTH
-        ? `Label must be at least ${MIN_TRANSLATION_KEY_LENGTH} characters long`
+        ? translate({ label: 'action.create.error.tooShort' })
         : true,
   });
 
@@ -31,7 +31,13 @@ export async function tryCreateLabel(config: Config) {
   for (const locale of config.locales) {
     const ref = config.referenceLocale === locale;
     const labelValue = await input({
-      message: `Enter the value for locale ${chalk.underline(getLocaleName(locale))}${chalk.reset(ref ? ' ★' : '')}:`,
+      message: translate({
+        label: 'action.create.value',
+        args: [
+          chalk.underline(getLocaleName(locale)),
+          chalk.reset(ref ? ' ★' : ''),
+        ],
+      }),
       theme,
       required: ref,
     });
@@ -40,7 +46,7 @@ export async function tryCreateLabel(config: Config) {
   }
 
   if (!localeTranslations.size) {
-    info('No translations provided. Label creation aborted.');
+    info(translate({ label: 'action.create.error.empty' }));
     return;
   }
 
@@ -66,10 +72,16 @@ export async function tryCreateLabel(config: Config) {
 
   const action = await select(
     {
-      message: 'Would you like to create another one?',
+      message: translate({ label: 'action.create.additional' }),
       choices: [
-        { name: 'Yes', value: true },
-        { name: 'No', value: false },
+        {
+          name: translate({ label: 'action.create.additional.yes' }),
+          value: true,
+        },
+        {
+          name: translate({ label: 'action.create.additional.no' }),
+          value: false,
+        },
       ],
       theme,
     },
