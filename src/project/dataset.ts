@@ -11,6 +11,7 @@ export async function getTranslationDataset(
   const pageSize = 100;
   let offset = 0;
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (true) {
     const { data, error } = await labeleer.project.translations.get({
       query: { projectId, limit: `${pageSize}`, offset: `${offset}` },

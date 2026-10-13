@@ -1,9 +1,9 @@
 import { tryCreateLabel } from '@/actions/create-labels';
+import { Action, inquireUserAction } from '@/actions/inquiry';
 import { translate } from '@/core/i18n';
 import { resolveAccessToken } from '@/project/access-token';
-import { inquireUserAction, Action } from '@/inquire/action';
-import { inquireProjectConfig }      from '@/project/config';
-import { exitMessage, info }         from '@/utils';
+import { inquireProjectConfig } from '@/project/config';
+import { exitMessage, info } from '@/utils';
 import { tryPublishLocalLabels } from '@/actions/publish-labels';
 import { tryRetrieveLabels } from '@/actions/retrieve-labels';
 import { parseArgs } from 'node:util';

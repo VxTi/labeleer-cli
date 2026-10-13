@@ -1,3 +1,4 @@
+import { type Nullable } from '@/core/type-utils';
 import {
   type Plurality,
   type TranslationDataset,
@@ -26,7 +27,7 @@ export function translate({
   plurality,
   args,
 }: InternalTranslationProps): string {
-  const labelEntry = typed[label] as TranslationEntry;
+  const labelEntry = typed[label] as Nullable<TranslationEntry>;
   const locale = defaultLocale;
   const nonPluralized = labelEntry?.translations[locale];
   const entry: string | undefined =

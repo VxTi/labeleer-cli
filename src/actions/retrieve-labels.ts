@@ -27,7 +27,7 @@ export async function tryRetrieveLabels(config: Config): Promise<void> {
     chalk.blue(
       translate({
         label: 'actions.retrieve.success',
-        args: [toRelativePath(Object.values(config.paths ?? {}).join(', '))],
+        args: [toRelativePath(Object.values(config.paths).join(', '))],
       })
     )
   );

@@ -1,7 +1,7 @@
 import { translate } from '@/core/i18n';
 import { readLocalLabelFiles } from '@/project/label-file';
-import { type Config }         from '@/project/config';
-import { info }                from '@/utils';
+import { type Config } from '@/project/config';
+import { info } from '@/utils';
 import { labeleer } from '@labeleer/api';
 import chalk from 'chalk';
 import ora from 'ora';
@@ -20,11 +20,14 @@ export async function tryPublishLocalLabels(config: Config): Promise<void> {
     },
   });
 
-  if (!result.data?.success || result.error) {
-    loader.fail(
-      chalk.red(translate({ label: 'actions.publish.loading.failure' }))
-    );
-    info(result.error);
+  if (!result.data?.success) {
+    loader.stopAndPersist({
+      symbol: chalk.blue('┃'),
+      text: chalk.red(
+        `✖ ${translate({ label: 'actions.publish.loading.failure' })}`
+      ),
+    });
+    if (result.error?.error) info(result.error.error);
     return;
   }
 

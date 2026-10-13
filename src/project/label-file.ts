@@ -1,4 +1,4 @@
-import { entries }                                 from '@/core/type-utils';
+import { entries } from '@/core/type-utils';
 import type { AbsolutePath, Config, RelativePath } from './config';
 import {
   defaultTransformerSet,
@@ -6,7 +6,7 @@ import {
   type Locale,
   type ParsingOptions,
   type TranslationDataset,
-}                                                  from '@labeleer/translation-dataset-transformers';
+} from '@labeleer/translation-dataset-transformers';
 import { readFile, writeFile } from 'fs/promises';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,7 +18,7 @@ export async function readLocalLabelFiles(
   const transformer = defaultTransformerSet.getByFormat(config.format);
   const options: ParsingOptions = { referenceLocale: config.referenceLocale };
 
-  return readAggregate(config, transformer, config.paths ?? {}, options);
+  return readAggregate(config, transformer, config.paths, options);
 }
 
 async function readAggregate(
@@ -27,7 +27,7 @@ async function readAggregate(
   paths: Partial<Record<Locale, RelativePath>>,
   options: ParsingOptions
 ): Promise<TranslationDataset> {
-  const pairs = entries(paths ?? {}) as [Locale, RelativePath][];
+  const pairs = entries(paths) as [Locale, RelativePath][];
   const missing: Locale[] = [];
   const labelFiles: Partial<Record<Locale, string>> = {};
 
@@ -59,7 +59,7 @@ export async function updateLocalLabelFile(
 ): Promise<void> {
   const transformer = defaultTransformerSet.getByFormat(config.format);
   const serialized = transformer.serialize(dataset, {
-    referenceLocale: config.referenceLocale ?? config.locales[0],
+    referenceLocale: config.referenceLocale,
     locales: config.locales,
   });
 

@@ -3,8 +3,8 @@ import { Ok, type Result } from '@/core/result';
 import {
   readLocalLabelFiles,
   updateLocalLabelFile,
-}                                   from '@/project/label-file';
-import { type Config }              from '@/project/config';
+} from '@/project/label-file';
+import { type Config } from '@/project/config';
 import { exitMessage, info, theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
 import { labeleer } from '@labeleer/api';
@@ -15,6 +15,7 @@ import {
   type TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
+import ora from 'ora';
 
 export async function tryCreateLabel(config: Config) {
   const labelName = await input({
@@ -68,7 +69,17 @@ export async function tryCreateLabel(config: Config) {
     )
   );
 
-  await publishToLabeleer(config, labelName, localeTranslations);
+  const publishLoader = ora({}).start();
+  const publishResult = await publishToLabeleer(
+    config,
+    labelName,
+    localeTranslations
+  );
+  if (publishResult.ok) {
+    publishLoader.stop();
+  } else {
+    publishLoader.fail('Failed to synchronize with Labeleer. Try again later');
+  }
 
   const action = await select(
     {
