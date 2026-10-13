@@ -1,5 +1,9 @@
 import { entries } from '@/core/type-utils';
-import { type Config } from '@/project/labeleer-config';
+import {
+  type AbsolutePath,
+  type Config,
+  type RelativePath,
+} from '@/project/labeleer-config';
 import {
   defaultTransformerSet,
   type LanguageFileTransformer,
@@ -8,7 +12,9 @@ import {
   type TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 import { readFile, writeFile } from 'fs/promises';
+import { thru } from 'lodash-es';
 import fs from 'node:fs';
+import * as path from 'node:path';
 
 export async function readLocalLabelFiles(
   config: Config
@@ -16,36 +22,27 @@ export async function readLocalLabelFiles(
   const transformer = defaultTransformerSet.getByFormat(config.format);
   const options: ParsingOptions = { referenceLocale: config.referenceLocale };
 
-  if (config.path) {
-    return readSingular(transformer, config.path, options);
-  }
-
-  return readAggregate(transformer, config.paths ?? {}, options);
-}
-
-async function readSingular(
-  transformer: LanguageFileTransformer<any, any, any>,
-  path: string,
-  options: ParsingOptions
-): Promise<TranslationDataset> {
-  return exists(path)
-    .then(() => readFile(path, 'utf-8'))
-    .then(content => transformer.parse(content, options));
+  return readAggregate(config, transformer, config.paths ?? {}, options);
 }
 
 async function readAggregate(
+  config: Config,
   transformer: LanguageFileTransformer<any, any, any>,
-  paths: Partial<Record<Locale, string>>,
+  paths: Partial<Record<Locale, RelativePath>>,
   options: ParsingOptions
 ): Promise<TranslationDataset> {
-  const pairs = entries(paths ?? {}) as [Locale, string][];
+  const pairs = entries(paths ?? {}) as [Locale, RelativePath][];
   const missing: Locale[] = [];
   const labelFiles: Partial<Record<Locale, string>> = {};
 
   await Promise.all(
-    pairs.map(async ([locale, path]) => {
-      await exists(path)
-        .then(() => readFile(path, 'utf-8'))
+    pairs.map(async ([locale, relativePath]) => {
+      const absolutePath: AbsolutePath = path.resolve(
+        config.rootDir,
+        relativePath
+      );
+      await exists(absolutePath)
+        .then(() => readFile(absolutePath, 'utf-8'))
         .then(content => (labelFiles[locale] = content))
         .catch(() => {
           missing.push(locale);
@@ -72,9 +69,19 @@ export async function updateLocalLabelFile(
 
   await Promise.all(
     entries(serialized).map(([path, file]) =>
-      writeFile(path, file.content, { encoding: 'utf-8' })
+      thru(resolvePath(config, path), absolutePath =>
+        exists(absolutePath).then(() =>
+          writeFile(resolvePath(config, path), file.content, {
+            encoding: 'utf-8',
+          })
+        )
+      )
     )
   );
+}
+
+function resolvePath(config: Config, serializedPath: string): string {
+  return path.join(config.rootDir, serializedPath);
 }
 
 async function exists(path: string): Promise<boolean> {

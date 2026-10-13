@@ -1,3 +1,5 @@
+import { translate } from '@/core/i18n';
+import { Ok, type Result } from '@/core/result';
 import {
   readLocalLabelFiles,
   updateLocalLabelFile,
@@ -5,9 +7,12 @@ import {
 import { type Config } from '@/project/labeleer-config';
 import { exitMessage, info, theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
+import { labeleer } from '@labeleer/api';
 import {
   getLocaleName,
   type Locale,
+  MIN_TRANSLATION_KEY_LENGTH,
+  type TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
 
@@ -15,6 +20,10 @@ export async function tryCreateLabel(config: Config) {
   const labelName = await input({
     message: 'Enter the name of the new label:',
     theme,
+    validate: v =>
+      v.length < MIN_TRANSLATION_KEY_LENGTH
+        ? `Label must be at least ${MIN_TRANSLATION_KEY_LENGTH} characters long`
+        : true,
   });
 
   const localeTranslations = new Map<Locale, string>();
@@ -44,7 +53,13 @@ export async function tryCreateLabel(config: Config) {
 
   // Write back to the label file
   await updateLocalLabelFile(config, dataset);
-  info(chalk.blue(`Label '${labelName}' has been added to the label file.`));
+  info(
+    chalk.blue(
+      translate({ label: 'actions.create.success', args: [labelName] })
+    )
+  );
+
+  await publishToLabeleer(config, labelName, localeTranslations);
 
   const action = await select(
     {
@@ -63,4 +78,29 @@ export async function tryCreateLabel(config: Config) {
   }
 
   await tryCreateLabel(config);
+}
+
+async function publishToLabeleer(
+  config: Config,
+  labelName: string,
+  map: Map<Locale, string>
+): Promise<Result<boolean>> {
+  const dataset: TranslationDataset = {};
+  map.forEach((translation, locale) => {
+    dataset[labelName] = dataset[labelName] ?? { translations: {} };
+    dataset[labelName].translations[locale] = translation;
+  });
+  const result = await labeleer.project.translations.update({
+    headers: {
+      Authorization: `Bearer ${config.accessToken}`,
+    },
+    body: {
+      projectId: config.projectId,
+      entries: dataset,
+    },
+  });
+
+  if (result.data?.success) return Ok(true);
+
+  return Ok(false);
 }

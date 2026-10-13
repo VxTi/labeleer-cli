@@ -1,58 +1,75 @@
 {
   "actions.retrieve": {
+    "plurals": {},
     "translations": {
       "en_US": "Retrieve"
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
   },
   "actions.publish": {
+    "plurals": {},
     "translations": {
       "en_US": "Publish"
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
   },
   "actions.createNew": {
+    "plurals": {},
     "translations": {
       "en_US": "Create new label"
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
   },
   "actions.cancel": {
+    "plurals": {},
     "translations": {
       "en_US": "⨯ Cancel"
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
   },
   "project.create.format.title": {
+    "plurals": {},
     "translations": {
       "en_US": "What kind of project would you like to create?"
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
   },
   "project.create.format.error.alreadyExists": {
+    "plurals": {},
     "translations": {
       "en_US": "Labels file already exists."
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
   },
   "project.create.success": {
+    "plurals": {},
     "translations": {
       "en_US": "Initialized project at {0}"
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
   },
   "project.locales.failure": {
+    "plurals": {},
     "translations": {
       "en_US": "Failed to retrieve project languages"
     },
-    "tags": [],
-    "plurals": {}
+    "tags": []
+  },
+  "actions.create.success": {
+    "plurals": {},
+    "translations": {
+      "en_US": "Label '{0}' has been added to the label file"
+    }
+  },
+  "actions.title": {
+    "plurals": {},
+    "translations": {
+      "en_US": "What would you like to do?"
+    }
+  },
+  "labels.read.failure": {
+    "translations": {
+      "en_US": "Missing label files for locales: {0}"
+    }
   }
 }

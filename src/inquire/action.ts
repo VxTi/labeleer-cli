@@ -12,7 +12,7 @@ export const enum Action {
 export async function inquireUserAction(): Promise<Action> {
   return await select(
     {
-      message: 'What would you like to do?',
+      message: translate({ label: 'actions.title' }),
       choices: [
         {
           name: translate({ label: 'actions.retrieve' }),

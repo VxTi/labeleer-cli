@@ -8,10 +8,6 @@ import { tryRetrieveLabels } from '@/actions/retrieve-labels';
 import { parseArgs } from 'node:util';
 import chalk from 'chalk';
 
-process.on('warning', warning => {
-  console.log(warning.stack);
-});
-
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const { values } = parseArgs({

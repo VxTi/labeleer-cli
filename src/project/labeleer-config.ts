@@ -1,57 +1,101 @@
-import { Ok, type Result } from '@/core/result';
-import {
-  isNonEmptyArray,
-  isNotNil,
-  mapConstantArray,
-  type NonEmptyArray,
-  type Nullable,
-} from '@/core/type-utils';
+import { Err, type ErrorStack, Ok, type Result } from '@/core/result';
+import { keys, mapConstantArray } from '@/core/type-utils';
 import { getTranslationDataset } from '@/project/dataset';
+import { updateLocalLabelFile } from '@/project/label-file';
 import { getLanguages } from '@/project/locales';
 import { info, theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
 import {
   FileFormat,
   Locales,
-  defaultTransformerSet,
   type Locale,
 } from '@labeleer/translation-dataset-transformers';
 import chalk from 'chalk';
 import { readFile, writeFile } from 'fs/promises';
 import * as path from 'node:path';
+import { ZodError } from 'zod';
 import * as z from 'zod';
 
 const cwd = process.cwd();
 
+export type RelativePath = string & {};
+export type AbsolutePath = string & {};
+
 const configDecoder = z.object({
   projectId: z.string(),
-  format: z.enum(FileFormat),
-  paths: z.optional(z.partialRecord(z.enum(Locales), z.string())),
-  path: z.optional(z.string()),
-  locales: z.array(z.enum(Locales)).refine(arr => isNonEmptyArray(arr)),
-  referenceLocale: z.enum(Locales),
+  format: z.enum(FileFormat, {
+    error: `expected one of ${Object.values(FileFormat).join(', ')}`,
+  }),
+  rootDir: z
+    .string()
+    .describe('The root directory in which the translations files live'),
+  paths: z
+    .partialRecord(z.enum(Locales), z.string())
+    .describe(
+      'A dictionary of locale to relative path mapping,' +
+        ' relative to the root directory (see rootDir)'
+    ),
+  referenceLocale: z.enum(Locales, {
+    error: 'Expected a POSIX formatted locale',
+  }),
 });
 
-export type Config = z.infer<typeof configDecoder> & {
+export interface Config {
+  projectId: string;
+  format: FileFormat;
+  rootDir: RelativePath;
+  paths: Partial<Record<Locale, RelativePath>>;
   accessToken: string;
-  configPath: string;
-  locales: NonEmptyArray<Locale>;
+  locales: Locale[];
   referenceLocale: Locale;
-};
+  configPath: RelativePath;
+}
 export type SafeConfig = Omit<Config, 'accessToken'>;
 
 const DEFAULT_CONFIG_FILE_NAME = 'labeleer.json';
-const DEFAULT_LABEL_FILE_NAME = 'labels';
+
+type ProjectConfigError = ErrorStack<'format' | 'read'>;
 
 export async function getProjectConfig(
   accessToken: string
-): Promise<Nullable<Config>> {
+): Promise<Result<Config, ProjectConfigError>> {
   const configPath: string = path.resolve(cwd, DEFAULT_CONFIG_FILE_NAME);
   return await readFile(configPath, 'utf-8')
     .then((content): unknown => JSON.parse(content))
     .then(json => configDecoder.parseAsync(json))
-    .then((parsed): Config => ({ ...parsed, accessToken, configPath }))
-    .catch(() => undefined);
+    .then(parsed =>
+      Ok<Config>({
+        ...parsed,
+        rootDir: path.resolve(cwd, parsed.rootDir),
+        locales: keys(parsed.paths),
+        accessToken,
+        configPath,
+      })
+    )
+    .catch((err: unknown) => {
+      const message: ProjectConfigError =
+        err instanceof ZodError
+          ? formatZodError(err)
+          : {
+              type: 'read',
+              message: err instanceof Error ? err.message : 'Unknown',
+            };
+      return Err<ProjectConfigError>(message);
+    });
+}
+
+function formatZodError(err: ZodError): ProjectConfigError {
+  const message = err.issues
+    .map(
+      issue =>
+        `Invalid value for property ${chalk.underline(issue.path.join('.'))}:\n${issue.message}`
+    )
+    .join('. ');
+
+  return {
+    type: 'format',
+    message,
+  };
 }
 
 export async function createProjectConfig(
@@ -59,13 +103,11 @@ export async function createProjectConfig(
   projectId: string,
   format: FileFormat
 ): Promise<Result<Config>> {
-  const extension = defaultTransformerSet.getByFormat(format).extensions[0];
-  const fileName = `${DEFAULT_LABEL_FILE_NAME}${extension}`;
   const configPath = path.resolve(cwd, DEFAULT_CONFIG_FILE_NAME);
-  const labelFilePath = path.resolve(cwd, fileName);
 
   const languagesRes = await getLanguages(accessToken, projectId);
   if (!languagesRes.ok) return languagesRes;
+
   const languages = languagesRes.value;
   const translations =
     (await getTranslationDataset(accessToken, projectId)) ?? {};
@@ -74,29 +116,38 @@ export async function createProjectConfig(
     languages.find(locale => locale.is_reference)?.locale ??
     languages[0].locale;
 
-  const config: Omit<SafeConfig, 'configPath'> = {
+  const safeConfig: Omit<SafeConfig, 'configPath'> = {
     projectId,
     format,
-    path: path.relative(cwd, labelFilePath),
+    rootDir: cwd,
+    paths: {},
     locales: mapConstantArray(languages, l => l.locale),
     referenceLocale,
   };
 
-  await writeFile(labelFilePath, JSON.stringify(translations, null, 2));
-  await writeFile(configPath, JSON.stringify(config, null, 2));
+  const config: Config = { ...safeConfig, configPath, accessToken };
 
-  return Ok({ ...config, configPath, accessToken });
+  await updateLocalLabelFile(config, translations);
+  await writeFile(configPath, JSON.stringify(safeConfig, null, 2));
+
+  return Ok(config);
 }
 
 export async function inquireProjectConfig(
   accessToken: string
 ): Promise<Result<Config>> {
   const config = await getProjectConfig(accessToken);
-  if (isNotNil(config)) return Ok(config);
+  if (config.ok) return config;
+
+  if (config.error.type === 'format') {
+    const message = `The config file seems to be corrupt.\n${config.error.message}`;
+
+    message.split('\n').forEach(l => info(chalk.red(l)));
+    process.exit(0);
+  }
 
   const createNew = await select({
-    message:
-      'Unable to locate project settings file. Would you like to create a new one?',
+    message: `${config.error.message}. Would you like to create a new one?`,
     choices: [
       { name: 'Yes', value: true },
       { name: 'No', value: false },

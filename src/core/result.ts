@@ -3,17 +3,24 @@ export interface SuccessResult<TOutput> {
   value: TOutput;
 }
 
-export interface ErrorResult {
+export interface ErrorResult<T = string> {
   ok: false;
-  error: string;
+  error: T;
 }
 
-export type Result<TOutput> = SuccessResult<TOutput> | ErrorResult;
+export interface ErrorStack<T extends string> {
+  type: T;
+  message: string;
+}
+
+export type Result<TOutput, TErr = string> =
+  | SuccessResult<TOutput>
+  | ErrorResult<TErr>;
 
 export function Ok<T>(value: T): SuccessResult<T> {
   return { ok: true, value };
 }
 
-export function Err(error: string): ErrorResult {
+export function Err<T = string>(error: T): ErrorResult<T> {
   return { ok: false, error };
 }
