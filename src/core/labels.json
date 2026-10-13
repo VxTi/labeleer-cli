@@ -4,58 +4,50 @@
       "en_US": {}
     },
     "translations": {
-      "en_US": "Retrieve"
-    },
-    "tags": []
+      "en_US": "Sync remote changes"
+    }
   },
   "actions.publish": {
     "plurals": {},
     "translations": {
-      "en_US": "Publish"
-    },
-    "tags": []
+      "en_US": "Publish local changes"
+    }
   },
   "actions.createNew": {
     "plurals": {},
     "translations": {
       "en_US": "Create new label"
-    },
-    "tags": []
+    }
   },
   "actions.cancel": {
     "plurals": {},
     "translations": {
       "en_US": "⨯ Cancel"
-    },
-    "tags": []
+    }
   },
   "project.create.format.title": {
     "plurals": {},
     "translations": {
       "en_US": "What kind of project would you like to create?"
-    },
-    "tags": []
+    }
   },
   "project.create.format.error.alreadyExists": {
     "plurals": {},
     "translations": {
       "en_US": "Labels file already exists."
-    },
-    "tags": []
+    }
   },
   "project.create.success": {
     "plurals": {},
     "translations": {
       "en_US": "Initialized project at {0}"
-    },
-    "tags": []
+    }
   },
   "project.locales.failure": {
     "plurals": {},
     "translations": {
       "en_US": "Failed to retrieve project languages"
-    },
-    "tags": []
+    }
   },
   "actions.create.success": {
     "plurals": {},
@@ -144,7 +136,7 @@
   "actions.publish.success": {
     "plurals": {},
     "translations": {
-      "en_US": "Local labels have been synchronized with remote project"
+      "en_US": "Local labels have been published to Labeleer"
     }
   },
   "actions.retrieve.failure": {

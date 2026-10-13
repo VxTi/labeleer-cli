@@ -30,6 +30,8 @@ export async function tryPublishLocalLabels(config: Config): Promise<void> {
     if (result.error?.error) info(result.error.error);
     return;
   }
-
-  loader.succeed(chalk.green(translate({ label: 'actions.publish.success' })));
+  loader.stopAndPersist({
+    symbol: chalk.blue('┃'),
+    text: chalk.green(`✔ ${translate({ label: 'actions.publish.success' })}`),
+  });
 }
