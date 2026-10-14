@@ -73,6 +73,10 @@ async function getEnvFilePath(): Promise<Result<string>> {
     return Ok(candidates[0]);
   }
 
+  const preferred = candidates.filter(isPreferredEnvFile);
+
+  if (hasArrayLength(preferred, 1)) return Ok(preferred[0]);
+
   return await select(
     {
       message: 'Identified multiple .env files. Please select one to use:',
@@ -84,4 +88,8 @@ async function getEnvFilePath(): Promise<Result<string>> {
     },
     { clearPromptOnDone: true }
   ).then(res => Ok(res));
+}
+
+function isPreferredEnvFile(fileName: string): boolean {
+  return fileName === '.env' || fileName === '.env.local';
 }
