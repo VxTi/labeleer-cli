@@ -15,7 +15,7 @@ async function main(): Promise<void> {
     args,
     options: {
       projectId: { type: 'string' },
-      accessToken: { type: 'string' },
+      ['access-token']: { type: 'string' },
       format: { type: 'string' },
       path: { type: 'string', multiple: true },
     },
@@ -24,7 +24,7 @@ async function main(): Promise<void> {
     `${chalk.blue('┏━')} ${chalk.bgBlack.bold.whiteBright(translate({ label: 'cli.title' }))}`
   );
 
-  const accessTokenRes = await resolveAccessToken(values.accessToken);
+  const accessTokenRes = await resolveAccessToken(values['access-token']);
   if (!accessTokenRes.ok) {
     info(accessTokenRes.error);
     process.exit(1);

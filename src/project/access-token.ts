@@ -10,10 +10,16 @@ import { readdir, readFile } from 'fs/promises';
 import { isNil } from 'lodash-es';
 import { parseEnv } from 'node:util';
 
+const ACCESS_TOKEN_ENV_KEY = 'LABELEER_ACCESS_TOKEN';
+
 export async function resolveAccessToken(
   accessToken?: string
 ): Promise<Result<string>> {
   if (accessToken) return Ok(accessToken);
+
+  const envKey = process.env[ACCESS_TOKEN_ENV_KEY];
+
+  if (envKey) return Ok(envKey);
 
   return await extractProjectConfigFromEnv();
 }
