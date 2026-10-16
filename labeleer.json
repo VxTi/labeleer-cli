@@ -1,7 +1,6 @@
 {
   "projectId": "aL5CN2AqUKwP",
-  "format": "json",
   "rootDir": "./src/core",
-  "paths": { "en_US": "labels.json" },
-  "referenceLocale": "en_US"
+  "format": "json",
+  "labelFile":  "labels.json"
 }

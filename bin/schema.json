@@ -1,56 +1,79 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "type": "object",
-  "properties": {
-    "projectId": {
-      "type": "string",
-      "description": "The unique ID of the project. This can be found in the project settings menu"
-    },
-    "format": {
-      "description": "The format in which the translation files are stored.",
-      "$ref": "#/$defs/Format"
-    },
-    "rootDir": {
-      "type": "string",
-      "description": "The root directory in which the translations files live"
-    },
-    "paths": {
+  "anyOf": [
+    {
       "type": "object",
-      "propertyNames": {
-        "$ref": "#/$defs/Locale"
+      "properties": {
+        "projectId": {
+          "type": "string",
+          "description": "The unique ID of the project. This can be found in the project settings menu"
+        },
+        "rootDir": {
+          "type": "string",
+          "description": "The root directory in which the translations files live"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "json",
+            "yaml",
+            "xcstrings"
+          ]
+        },
+        "labelFile": {
+          "type": "string",
+          "description": "Name of the primary labels file"
+        }
       },
-      "additionalProperties": {
-        "type": "string"
-      },
-      "description": "A dictionary of locale to relative path mapping, relative to the root directory (see rootDir)"
-    },
-    "referenceLocale": {
-      "description": "The reference locale of the project. This is automatically populated when loading the CLI",
-      "$ref": "#/$defs/Locale"
-    }
-  },
-  "required": [
-    "projectId",
-    "format",
-    "rootDir",
-    "paths",
-    "referenceLocale"
-  ],
-  "additionalProperties": false,
-  "$defs": {
-    "Format": {
-      "type": "string",
-      "enum": [
-        "json",
-        "yaml",
-        "ts",
-        "po",
-        "android_strings",
-        "apple_strings",
-        "xliff",
-        "xcstrings"
+      "required": [
+        "projectId",
+        "rootDir",
+        "format",
+        "labelFile"
       ]
     },
+    {
+      "type": "object",
+      "properties": {
+        "projectId": {
+          "type": "string",
+          "description": "The unique ID of the project. This can be found in the project settings menu"
+        },
+        "rootDir": {
+          "type": "string",
+          "description": "The root directory in which the translations files live"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "xliff",
+            "apple_strings",
+            "android_strings",
+            "ts",
+            "po"
+          ]
+        },
+        "paths": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/Locale"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "description": "Path to the labels file for this locale"
+          },
+          "description": "A dictionary of locale to relative path mapping, relative to the root directory (see rootDir)"
+        }
+      },
+      "required": [
+        "projectId",
+        "rootDir",
+        "format",
+        "paths"
+      ]
+    }
+  ],
+  "$defs": {
     "Locale": {
       "type": "string",
       "enum": [

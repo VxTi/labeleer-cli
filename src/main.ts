@@ -2,7 +2,7 @@ import { tryCreateLabel } from '@/actions/create-labels';
 import { Action, inquireUserAction } from '@/actions/inquiry';
 import { translate } from '@/core/i18n';
 import { resolveAccessToken } from '@/project/access-token';
-import { inquireProjectConfig } from '@/project/config';
+import { inquireProjectConfig } from '@/project/config/inquiry';
 import { exitMessage, info } from '@/utils';
 import { tryPublishLocalLabels } from '@/actions/publish-labels';
 import { tryRetrieveLabels } from '@/actions/retrieve-labels';
@@ -14,10 +14,8 @@ async function main(): Promise<void> {
   const { values } = parseArgs({
     args,
     options: {
-      projectId: { type: 'string' },
       ['access-token']: { type: 'string' },
-      format: { type: 'string' },
-      path: { type: 'string', multiple: true },
+      config: { type: 'string' },
     },
   });
   console.log(
@@ -29,7 +27,10 @@ async function main(): Promise<void> {
     info(accessTokenRes.error);
     process.exit(1);
   }
-  const configRes = await inquireProjectConfig(accessTokenRes.value);
+  const configRes = await inquireProjectConfig(
+    accessTokenRes.value,
+    values['config']
+  );
   if (!configRes.ok) {
     info(configRes.error);
     process.exit(1);

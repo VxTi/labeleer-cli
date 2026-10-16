@@ -14,8 +14,7 @@ export interface ErrorStack<T extends string> {
 }
 
 export type Result<TOutput, TErr = string> =
-  | SuccessResult<TOutput>
-  | ErrorResult<TErr>;
+  SuccessResult<TOutput> | ErrorResult<TErr>;
 
 export function Ok<T>(value: T): SuccessResult<T> {
   return { ok: true, value };

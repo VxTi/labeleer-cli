@@ -1,0 +1,90 @@
+import { Ok, type Result } from '@/core/result';
+import { entries, fromEntries } from '@/core/type-utils';
+import { type Locale } from '@labeleer/translation-dataset-transformers';
+import { ProjectConfigSchema } from './schema';
+import {
+  type Config,
+  cwd,
+  DEFAULT_CONFIG_FILE_NAME,
+  type LabeleerFile,
+  toLabeleerFile,
+  tryGetLocales,
+} from './common';
+import { createProjectConfig } from '../create-project';
+import { exitMessage, theme } from '@/utils';
+import { select } from '@inquirer/prompts';
+import { readFile } from 'fs/promises';
+import path from 'node:path';
+
+export async function inquireProjectConfig(
+  accessToken: string,
+  configPath?: string
+): Promise<Result<Config>> {
+  const config = await getProjectConfig(accessToken, configPath);
+  if (config.ok) return config;
+
+  const createNew = await select({
+    message: `${config.error}.\nWould you like to create a new one?`,
+    choices: [
+      { name: 'Yes', value: true },
+      { name: 'No', value: false },
+    ],
+    theme,
+  });
+
+  if (!createNew) {
+    exitMessage();
+    process.exit(0);
+  }
+
+  const projectRes = await createProjectConfig(accessToken);
+
+  if (!projectRes.ok) return projectRes;
+
+  return Ok({ ...projectRes.value, accessToken });
+}
+
+export async function getProjectConfig(
+  accessToken: string,
+  configPath?: string
+): Promise<Result<Config>> {
+  const configFilePath: string =
+    configPath ?? path.resolve(cwd, DEFAULT_CONFIG_FILE_NAME);
+
+  const config = await readFile(configFilePath, 'utf-8').then(content =>
+    ProjectConfigSchema.parseAsync(JSON.parse(content))
+  );
+
+  const localesRes = await tryGetLocales(accessToken, config.projectId);
+  if (!localesRes.ok) return localesRes;
+
+  const { projectId, format } = config;
+
+  const rootDir = path.resolve(cwd, config.rootDir);
+  return Ok<Config>({
+    projectId,
+    referenceLocale: localesRes.value.referenceLocale,
+    locales: localesRes.value.locales,
+    format,
+    rootDir,
+    accessToken,
+    configFile: toLabeleerFile(configFilePath),
+    path:
+      config.type === 'single'
+        ? {
+            ref: 'single',
+            value: toLabeleerFile(path.resolve(cwd, config.labelFile)),
+          }
+        : {
+            ref: 'several',
+            value: fromEntries(
+              entries(config.paths).map(
+                ([locale, relativePath]): [Locale, LabeleerFile] => [
+                  locale,
+                  toLabeleerFile(path.resolve(rootDir, relativePath!)),
+                ]
+              )
+            ),
+          },
+  });
+}

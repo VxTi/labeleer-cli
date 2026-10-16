@@ -1,10 +1,10 @@
-import { ConfigDecoder } from '../src/project/config';
-import chalk             from 'chalk';
+import { ProjectConfigSchema } from '../src/project/config/schema';
+import chalk                   from 'chalk';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const __dirname = new URL('.', import.meta.url).pathname;
-const schema = ConfigDecoder.toJSONSchema();
+const schema = ProjectConfigSchema.toJSONSchema({ io: 'input' });
 const schemaFileName = 'schema.json';
 
 fs.writeFileSync(

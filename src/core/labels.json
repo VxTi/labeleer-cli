@@ -77,12 +77,6 @@
       "en_US": "Create new label"
     }
   },
-  "actions.project.create.configPath": {
-    "tags": ["create"],
-    "translations": {
-      "en_US": "Enter the relative path to the config file:"
-    }
-  },
   "actions.publish": {
     "tags": ["publish"],
     "translations": {

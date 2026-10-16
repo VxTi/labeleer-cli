@@ -1,8 +1,7 @@
-import { entries } from '@/core/type-utils';
-import type { AbsolutePath, Config, RelativePath } from './config';
+import { entries, fromEntries } from '@/core/type-utils';
+import type { Config, LabeleerFile } from './config/common';
 import {
   defaultTransformerSet,
-  type LanguageFileTransformer,
   type Locale,
   type ParsingOptions,
   type TranslationDataset,
@@ -10,7 +9,6 @@ import {
 import { readFile, writeFile } from 'fs/promises';
 import fs from 'node:fs';
 import path from 'node:path';
-import { thru } from 'lodash-es';
 
 export async function readLocalLabelFiles(
   config: Config
@@ -18,25 +16,16 @@ export async function readLocalLabelFiles(
   const transformer = defaultTransformerSet.getByFormat(config.format);
   const options: ParsingOptions = { referenceLocale: config.referenceLocale };
 
-  return readAggregate(config, transformer, config.paths, options);
-}
+  const pairs: [Locale, LabeleerFile][] =
+    config.path.ref === 'several'
+      ? (entries(config.path.value) as [Locale, LabeleerFile][])
+      : [[config.referenceLocale, config.path.value]];
 
-async function readAggregate(
-  config: Config,
-  transformer: LanguageFileTransformer<any, any, any>,
-  paths: Partial<Record<Locale, RelativePath>>,
-  options: ParsingOptions
-): Promise<TranslationDataset> {
-  const pairs = entries(paths) as [Locale, RelativePath][];
   const missing: Locale[] = [];
   const labelFiles: Partial<Record<Locale, string>> = {};
 
   await Promise.all(
-    pairs.map(async ([locale, relativePath]) => {
-      const absolutePath: AbsolutePath = path.resolve(
-        config.rootDir,
-        relativePath
-      );
+    pairs.map(async ([locale, { absolutePath }]) => {
       await exists(absolutePath)
         .then(() => readFile(absolutePath, 'utf-8'))
         .then(content => (labelFiles[locale] = content))
@@ -57,8 +46,8 @@ export async function updateLocalLabelFile(
   config: Config,
   dataset: TranslationDataset
 ): Promise<void> {
-  const sortedDataset = Object.fromEntries(
-    Object.entries(dataset).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+  const sortedDataset = fromEntries(
+    entries(dataset).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
   );
   const transformer = defaultTransformerSet.getByFormat(config.format);
   const serialized = transformer.serialize(sortedDataset, {
@@ -68,11 +57,9 @@ export async function updateLocalLabelFile(
 
   await Promise.all(
     entries(serialized).map(([path, file]) =>
-      thru(resolvePath(config, path), absolutePath =>
-        exists(absolutePath).then(() =>
-          writeFile(absolutePath, file.content, { encoding: 'utf-8' })
-        )
-      )
+      writeFile(resolvePath(config, path), file.content, {
+        encoding: 'utf-8',
+      })
     )
   );
 }
