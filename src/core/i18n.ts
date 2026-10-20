@@ -1,10 +1,9 @@
-import { type Nullable } from '@/core/type-utils';
-import {
-  type Plurality,
-  type TranslationDataset,
-  type TranslationEntry,
+import type {
+  Plurality,
+  TranslationDataset,
+  TranslationEntry,
 } from '@labeleer/translation-dataset-transformers';
-import { isNil } from 'lodash-es';
+import { type Nullable, isNil } from '@vxti/typed';
 import translations from './labels.json';
 
 const typed = translations satisfies TranslationDataset;

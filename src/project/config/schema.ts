@@ -1,22 +1,8 @@
 import {
-  type CompressedFormat,
-  compressedFormats,
-  FileFormat,
-  isCompressedFormat,
+  defaultTransformerSet,
   Locales,
 } from '@labeleer/translation-dataset-transformers';
 import * as z from 'zod';
-
-const LocaleSchema = z
-  .enum(Locales, { error: 'Expected a POSIX formatted locale' })
-  .meta({ id: 'Locale' });
-
-const ComposedFileFormat = z.enum(compressedFormats);
-const SingularFileFormat = z.enum(
-  Object.values(FileFormat).filter(
-    (f): f is Exclude<FileFormat, CompressedFormat> => !isCompressedFormat(f)
-  )
-);
 
 const CommonProjectConfigSchema = z.object({
   projectId: z
@@ -32,7 +18,7 @@ const CommonProjectConfigSchema = z.object({
 const SingularProjectConfig = z
   .object({
     ...CommonProjectConfigSchema.shape,
-    format: SingularFileFormat,
+    format: z.enum(defaultTransformerSet.singleOutputFormats),
     labelFile: z.string().describe('Name of the primary labels file'),
   })
   .transform(props => ({ ...props, type: 'single' as const }));
@@ -40,14 +26,15 @@ const SingularProjectConfig = z
 const ComposedProjectConfigSchema = z
   .object({
     ...CommonProjectConfigSchema.shape,
-    format: ComposedFileFormat,
+    format: z.enum(defaultTransformerSet.multipleOutputFormats),
     paths: z
-      .array(
+      .partialRecord(
+        z.enum(Locales),
         z
           .string()
           .describe('Path to one of the label files included in this project')
       )
-      .describe('List of paths to label files'),
+      .describe('Record of paths to label files'),
   })
   .transform(props => ({ ...props, type: 'composed' as const }));
 
@@ -55,3 +42,5 @@ export const ProjectConfigSchema = z.union([
   SingularProjectConfig,
   ComposedProjectConfigSchema,
 ]);
+
+export type RawProjectConfig = z.input<typeof ProjectConfigSchema>;

@@ -1,10 +1,10 @@
+import type { Config } from '@/project/config/common';
 import { translate } from '@/core/i18n';
 import { Err, Ok, type Result } from '@/core/result';
 import {
   readLocalLabelFiles,
   updateLocalLabelFile,
 } from '@/project/label-file';
-import { type Config } from '@/project/config';
 import { exitMessage, info, theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
 import { labeleer } from '@labeleer/api';

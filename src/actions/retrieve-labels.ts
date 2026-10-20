@@ -1,7 +1,7 @@
+import type { Config } from '@/project/config/common';
 import { translate } from '@/core/i18n';
 import { getTranslationDataset } from '@/project/dataset';
 import { updateLocalLabelFile } from '@/project/label-file';
-import { type Config } from '@/project/config';
 import { toRelativePath } from '@/files';
 import chalk from 'chalk';
 import ora from 'ora';
@@ -27,7 +27,13 @@ export async function tryRetrieveLabels(config: Config): Promise<void> {
     chalk.blue(
       translate({
         label: 'actions.retrieve.success',
-        args: [toRelativePath(Object.values(config.paths).join(', '))],
+        args: [
+          toRelativePath(
+            Object.entries(config.path.value)
+              .map(([loc, relativePath]) => `${loc} -> ${relativePath}`)
+              .join(', ')
+          ),
+        ],
       })
     )
   );

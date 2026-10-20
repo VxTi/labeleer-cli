@@ -14,7 +14,7 @@ export async function getLanguages(
   });
 
   if (error) {
-    return Err(error.details ?? 'No locales available');
+    return Err(error.details ?? error.error);
   }
   return Ok(data.data);
 }

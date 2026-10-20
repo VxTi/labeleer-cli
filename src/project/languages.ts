@@ -1,15 +1,15 @@
 import {
   isNonEmptyArray,
   isNonEmptyString,
+  isNil,
   type NonEmptyArray,
-} from '@/core/type-utils';
+} from '@vxti/typed';
 import { search, select } from '@inquirer/prompts';
 import {
   getLocaleName,
   type Locale,
   Locales,
 } from '@labeleer/translation-dataset-transformers';
-import { isNil } from 'lodash-es';
 
 export async function inquireCreateLocales(): Promise<
   NonEmptyArray<Locale> | undefined

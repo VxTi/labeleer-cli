@@ -1,12 +1,12 @@
-import { Ok, type Result } from '@/core/result';
-import { entries, fromEntries } from '@/core/type-utils';
-import { type Locale } from '@labeleer/translation-dataset-transformers';
+import { Err, Ok, type Result } from '@/core/result';
+import { getTranslationDataset } from '@/project/dataset';
+import { entries, fromEntries } from '@vxti/typed';
+import fs from 'node:fs';
 import { ProjectConfigSchema } from './schema';
 import {
   type Config,
   cwd,
   DEFAULT_CONFIG_FILE_NAME,
-  type LabeleerFile,
   toLabeleerFile,
   tryGetLocales,
 } from './common';
@@ -37,7 +37,7 @@ export async function inquireProjectConfig(
     process.exit(0);
   }
 
-  const projectRes = await createProjectConfig(accessToken);
+  const projectRes = await createProjectConfig(accessToken, configPath);
 
   if (!projectRes.ok) return projectRes;
 
@@ -51,12 +51,23 @@ export async function getProjectConfig(
   const configFilePath: string =
     configPath ?? path.resolve(cwd, DEFAULT_CONFIG_FILE_NAME);
 
+  if (!fs.existsSync(configFilePath)) {
+    return Err("It seems you don't have a project config file yet");
+  }
+
   const config = await readFile(configFilePath, 'utf-8').then(content =>
     ProjectConfigSchema.parseAsync(JSON.parse(content))
   );
 
   const localesRes = await tryGetLocales(accessToken, config.projectId);
   if (!localesRes.ok) return localesRes;
+
+  const translationsResult = await getTranslationDataset(
+    accessToken,
+    config.projectId
+  );
+  if (!translationsResult.ok) return translationsResult;
+  const translations = translationsResult.value;
 
   const { projectId, format } = config;
 
@@ -69,6 +80,7 @@ export async function getProjectConfig(
     rootDir,
     accessToken,
     configFile: toLabeleerFile(configFilePath),
+    translations,
     path:
       config.type === 'single'
         ? {
@@ -78,12 +90,10 @@ export async function getProjectConfig(
         : {
             ref: 'several',
             value: fromEntries(
-              entries(config.paths).map(
-                ([locale, relativePath]): [Locale, LabeleerFile] => [
-                  locale,
-                  toLabeleerFile(path.resolve(rootDir, relativePath!)),
-                ]
-              )
+              entries(config.paths).map(([locale, relativePath]) => [
+                locale,
+                toLabeleerFile(path.resolve(rootDir, relativePath!)),
+              ])
             ),
           },
   });

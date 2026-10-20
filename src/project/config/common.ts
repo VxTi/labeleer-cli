@@ -3,12 +3,13 @@ import {
   isNonEmptyArray,
   mapConstantArray,
   type NonEmptyArray,
-} from '@/core/type-utils';
+} from '@vxti/typed';
 import { inquireCreateLocales } from '@/project/languages';
 import { getLanguages } from '@/project/locales';
 import type {
   FileFormat,
   Locale,
+  TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 import path from 'node:path';
 
@@ -30,10 +31,11 @@ export interface Config {
   locales: NonEmptyArray<Locale>;
   referenceLocale: Locale;
   configFile: LabeleerFile;
+  translations: TranslationDataset;
   path:
     | {
         ref: 'several';
-        value: LabeleerFile[];
+        value: Partial<Record<Locale, LabeleerFile>>;
       }
     | {
         ref: 'single';
@@ -62,7 +64,10 @@ export async function tryGetLocales(
 
     return Ok({
       referenceLocale,
-      locales: mapConstantArray(languages, l => l.locale),
+      locales: mapConstantArray(
+        languages,
+        l => l.locale
+      ) as NonEmptyArray<Locale>,
     });
   }
 

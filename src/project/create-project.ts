@@ -1,6 +1,7 @@
 import { translate } from '@/core/i18n';
 import { Ok, type Result } from '@/core/result';
-import { entries, fromEntries, isNonEmptyArray } from '@/core/type-utils';
+import { entries, fromEntries, isNonEmptyArray } from '@vxti/typed';
+import type { RawProjectConfig } from '@/project/config/schema';
 import {
   type AbsolutePath,
   type Config,
@@ -16,7 +17,6 @@ import { input, select } from '@inquirer/prompts';
 import {
   defaultTransformerSet,
   FileFormat,
-  isCompressedFormat,
   type Locale,
 } from '@labeleer/translation-dataset-transformers';
 import { writeFile } from 'fs/promises';
@@ -25,7 +25,8 @@ import path from 'node:path';
 const cwd = process.cwd();
 
 export async function createProjectConfig(
-  accessToken: string
+  accessToken: string,
+  configPath?: string
 ): Promise<Result<Config>> {
   const projectId = await inquireProjectId();
   const format = await inquireFileFormat();
@@ -38,18 +39,19 @@ export async function createProjectConfig(
     projectId
   );
   if (!translationsResult.ok) return translationsResult;
-
   const translations = translationsResult.value;
+
+  const rootDir = configPath ? path.basename(configPath) : cwd;
   const configFile = toLabeleerFile(
-    path.resolve(cwd, DEFAULT_CONFIG_FILE_NAME)
+    path.resolve(rootDir, DEFAULT_CONFIG_FILE_NAME)
   );
   const { locales, referenceLocale } = localesRes.value;
 
-  const rootDir = cwd;
   const safeConfig: Omit<SafeConfig, 'configPath'> = {
     projectId,
     format,
     rootDir,
+    translations,
     locales,
     referenceLocale,
     configFile,
@@ -59,9 +61,33 @@ export async function createProjectConfig(
   const config: Config = { ...safeConfig, accessToken };
 
   await updateLocalLabelFile(config, translations);
-  await writeFile(configFile.absolutePath, JSON.stringify(safeConfig, null, 2));
+  await writeConfigFile(config);
 
   return Ok(config);
+}
+
+async function writeConfigFile(config: Config): Promise<void> {
+  const { projectId, configFile, format, rootDir } = config;
+
+  const content = {
+    projectId,
+    format,
+    rootDir: path.relative(cwd, rootDir) || '.',
+    ...(config.path.ref === 'single'
+      ? {
+          labelFile: config.path.value.absolutePath,
+        }
+      : {
+          paths: fromEntries(
+            entries(config.path.value).map(([loc, labeleerFile]) => [
+              loc,
+              path.relative(rootDir, labeleerFile!.absolutePath),
+            ])
+          ),
+        }),
+  } satisfies Omit<RawProjectConfig, 'format'> & { format: FileFormat };
+
+  await writeFile(configFile.absolutePath, JSON.stringify(content, null, 2));
 }
 
 function getInitialFilePaths(
@@ -92,10 +118,20 @@ function getInitialFilePaths(
     );
   }
 
-  if (isCompressedFormat(format)) {
+  if (!transformer.isSingleFileOutput) {
+    const value = fromEntries(
+      serialized.map(({ filePath, locale }) => {
+        if (!locale) {
+          throw new Error(`Unable to determine locale for ${filePath}`);
+        }
+
+        return [locale, toLabeleerFile(path.resolve(rootDir, filePath))];
+      })
+    );
+
     return {
       ref: 'several',
-      value: paths,
+      value,
     };
   }
 

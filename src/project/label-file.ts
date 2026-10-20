@@ -1,9 +1,10 @@
-import { entries, fromEntries } from '@/core/type-utils';
+import { entries, fromEntries, isNil } from '@vxti/typed';
 import type { Config, LabeleerFile } from './config/common';
 import {
   defaultTransformerSet,
   type Locale,
   type ParsingOptions,
+  type SerializationFile,
   type TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 import { readFile, writeFile } from 'fs/promises';
@@ -56,16 +57,37 @@ export async function updateLocalLabelFile(
   });
 
   await Promise.all(
-    entries(serialized).map(([path, file]) =>
-      writeFile(resolvePath(config, path), file.content, {
+    serialized.map(serializedFile =>
+      writeFile(resolvePath(config, serializedFile), serializedFile.content, {
         encoding: 'utf-8',
       })
     )
   );
 }
 
-function resolvePath(config: Config, serializedPath: string): string {
-  return path.join(config.rootDir, serializedPath);
+function resolvePath(
+  config: Config,
+  serializedFile: SerializationFile
+): string {
+  const { locale, filePath } = serializedFile;
+
+  if (config.path.ref === 'single') {
+    return path.join(config.rootDir, filePath);
+  }
+
+  if (isNil(locale)) {
+    throw new Error(
+      `Missing locale for serialized file: ${serializedFile.filePath}`
+    );
+  }
+  const localePath = config.path.value[locale];
+  if (isNil(localePath)) {
+    throw new Error(
+      `Missing config for locale: ${locale} in serialized file: ${serializedFile.filePath}`
+    );
+  }
+
+  return localePath.absolutePath;
 }
 
 async function exists(path: string): Promise<boolean> {

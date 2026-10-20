@@ -1,13 +1,13 @@
 import { Err, Ok, type Result } from '@/core/result';
 import {
+  isNil,
   hasArrayLength,
   isEmptyArray,
   isNonEmptyArray,
-} from '@/core/type-utils';
+} from '@vxti/typed';
 import { theme } from '@/utils';
 import { select } from '@inquirer/prompts';
 import { readdir, readFile } from 'fs/promises';
-import { isNil } from 'lodash-es';
 import { parseEnv } from 'node:util';
 
 const ACCESS_TOKEN_ENV_KEY = 'LABELEER_ACCESS_TOKEN';

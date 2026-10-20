@@ -35,6 +35,11 @@ async function main(): Promise<void> {
     info(configRes.error);
     process.exit(1);
   }
+  info(
+    `${chalk.gray(
+      '|'
+    )} Found ${chalk.underline(Object.keys(configRes.value.translations).length)} translation(s) with ${chalk.underline(configRes.value.locales.length)} language(s)`
+  );
   const config = configRes.value;
   const action = await inquireUserAction();
 

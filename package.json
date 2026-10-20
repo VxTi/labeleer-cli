@@ -25,8 +25,9 @@
     "dist"
   ],
   "dependencies": {
+    "@vxti/typed": "^1.1.0",
     "@labeleer/api": "1.0.3",
-    "@labeleer/translation-dataset-transformers": "^2.2.7",
+    "@labeleer/translation-dataset-transformers": "^2.3.0",
     "@inquirer/prompts": "^8.7.3",
     "lodash-es": "^4.18.1",
     "chalk": "^6.0.1",
