@@ -7,8 +7,8 @@ import {
   type SerializationFile,
   type TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
-import { readFile, writeFile } from 'fs/promises';
-import fs from 'node:fs';
+import { readFile } from 'fs/promises';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 
 export async function readLocalLabelFiles(
@@ -57,11 +57,7 @@ export async function updateLocalLabelFile(
   });
 
   await Promise.all(
-    serialized.map(serializedFile =>
-      writeFile(resolvePath(config, serializedFile), serializedFile.content, {
-        encoding: 'utf-8',
-      })
-    )
+    serialized.map(serializedFile => createFile(config, serializedFile))
   );
 }
 
@@ -90,6 +86,18 @@ function resolvePath(
   return localePath.absolutePath;
 }
 
+async function createFile(
+  config: Config,
+  file: SerializationFile
+): Promise<void> {
+  const absolutePath = resolvePath(config, file);
+  if (absolutePath.includes(path.sep)) {
+    // Create dir
+    await fs.mkdir(path.dirname(absolutePath), { recursive: true });
+  }
+  await fs.writeFile(absolutePath, file.content, { encoding: 'utf-8' });
+}
+
 async function exists(path: string): Promise<boolean> {
-  return fs.promises.access(path, fs.constants.F_OK).then(() => true);
+  return fs.access(path, fs.constants.F_OK).then(() => true);
 }

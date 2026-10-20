@@ -1,5 +1,9 @@
+import { tryCreateLabel } from '@/actions/create-labels';
+import { tryPublishLocalLabels } from '@/actions/publish-labels';
+import { tryRetrieveLabels } from '@/actions/retrieve-labels';
 import { translate } from '@/core/i18n';
-import { theme } from '@/utils';
+import { type Config } from '@/project/config/common';
+import { exitMessage, theme } from '@/utils';
 import { select } from '@inquirer/prompts';
 
 export const enum Action {
@@ -9,7 +13,7 @@ export const enum Action {
   CANCEL = 'cancel',
 }
 
-export async function inquireUserAction(): Promise<Action> {
+async function inquireUserAction(): Promise<Action> {
   return await select(
     {
       message: translate({ label: 'actions.title' }),
@@ -35,4 +39,22 @@ export async function inquireUserAction(): Promise<Action> {
     },
     { clearPromptOnDone: true }
   );
+}
+
+export async function inquireAndExecuteAction(config: Config): Promise<void> {
+  const action = await inquireUserAction();
+
+  switch (action) {
+    case Action.FETCH_LABELS:
+      await tryRetrieveLabels(config);
+      return;
+    case Action.PUBLISH_LABELS:
+      await tryPublishLocalLabels(config);
+      return;
+    case Action.CREATE_LABEL:
+      await tryCreateLabel(config);
+      return;
+    case Action.CANCEL:
+      exitMessage();
+  }
 }

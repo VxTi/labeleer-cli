@@ -1,11 +1,10 @@
-import { tryCreateLabel } from '@/actions/create-labels';
-import { Action, inquireUserAction } from '@/actions/inquiry';
+import { inquireAndExecuteAction } from '@/actions/inquiry';
 import { translate } from '@/core/i18n';
 import { resolveAccessToken } from '@/project/access-token';
+import { cwd } from '@/project/config/common';
 import { inquireProjectConfig } from '@/project/config/inquiry';
 import { exitMessage, info } from '@/utils';
-import { tryPublishLocalLabels } from '@/actions/publish-labels';
-import { tryRetrieveLabels } from '@/actions/retrieve-labels';
+import path from 'node:path';
 import { parseArgs } from 'node:util';
 import chalk from 'chalk';
 
@@ -35,27 +34,16 @@ async function main(): Promise<void> {
     info(configRes.error);
     process.exit(1);
   }
-  info(
-    `${chalk.gray(
-      '|'
-    )} Found ${chalk.underline(Object.keys(configRes.value.translations).length)} translation(s) with ${chalk.underline(configRes.value.locales.length)} language(s)`
-  );
-  const config = configRes.value;
-  const action = await inquireUserAction();
 
-  switch (action) {
-    case Action.FETCH_LABELS:
-      await tryRetrieveLabels(config);
-      return;
-    case Action.PUBLISH_LABELS:
-      await tryPublishLocalLabels(config);
-      return;
-    case Action.CREATE_LABEL:
-      await tryCreateLabel(config);
-      return;
-    case Action.CANCEL:
-      exitMessage();
-  }
+  const config = configRes.value;
+  info(
+    `Found ${chalk.underline(Object.keys(config.translations).length)} translation(s) with ${chalk.underline(config.locales.length)} language(s)`
+  );
+  info(
+    `Project file: ${chalk.underline(path.relative(cwd, config.configFile.absolutePath))} ${chalk.gray('▪')} ${chalk.underline(config.format)}`
+  );
+
+  await inquireAndExecuteAction(config);
 }
 
 main().catch(error => {

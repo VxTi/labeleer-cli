@@ -2,6 +2,7 @@ import { Err, Ok, type Result } from '@/core/result';
 import { getTranslationDataset } from '@/project/dataset';
 import { entries, fromEntries } from '@vxti/typed';
 import fs from 'node:fs';
+import ora from 'ora';
 import { ProjectConfigSchema } from './schema';
 import {
   type Config,
@@ -20,11 +21,13 @@ export async function inquireProjectConfig(
   accessToken: string,
   configPath?: string
 ): Promise<Result<Config>> {
+  const spinner = ora('Loading project configuration...').start();
   const config = await getProjectConfig(accessToken, configPath);
+  spinner.stop();
   if (config.ok) return config;
 
   const createNew = await select({
-    message: `${config.error}.\nWould you like to create a new one?`,
+    message: `${config.error}.\n    Would you like to create a new one?`,
     choices: [
       { name: 'Yes', value: true },
       { name: 'No', value: false },

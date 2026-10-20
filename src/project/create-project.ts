@@ -2,6 +2,7 @@ import { translate } from '@/core/i18n';
 import { Ok, type Result } from '@/core/result';
 import { entries, fromEntries, isNonEmptyArray } from '@vxti/typed';
 import type { RawProjectConfig } from '@/project/config/schema';
+import fs from 'node:fs/promises';
 import {
   type AbsolutePath,
   type Config,
@@ -19,7 +20,6 @@ import {
   FileFormat,
   type Locale,
 } from '@labeleer/translation-dataset-transformers';
-import { writeFile } from 'fs/promises';
 import path from 'node:path';
 
 const cwd = process.cwd();
@@ -75,7 +75,7 @@ async function writeConfigFile(config: Config): Promise<void> {
     rootDir: path.relative(cwd, rootDir) || '.',
     ...(config.path.ref === 'single'
       ? {
-          labelFile: config.path.value.absolutePath,
+          labelFile: path.relative(rootDir, config.path.value.absolutePath),
         }
       : {
           paths: fromEntries(
@@ -87,7 +87,7 @@ async function writeConfigFile(config: Config): Promise<void> {
         }),
   } satisfies Omit<RawProjectConfig, 'format'> & { format: FileFormat };
 
-  await writeFile(configFile.absolutePath, JSON.stringify(content, null, 2));
+  await fs.writeFile(configFile.absolutePath, JSON.stringify(content, null, 2));
 }
 
 function getInitialFilePaths(
@@ -108,8 +108,8 @@ function getInitialFilePaths(
     { locales, referenceLocale }
   );
 
-  const paths = entries(serialized).map(([filePath]) =>
-    toLabeleerFile(path.resolve(rootDir, filePath))
+  const paths = serialized.map(file =>
+    toLabeleerFile(path.resolve(rootDir, file.filePath))
   );
 
   if (!isNonEmptyArray(paths)) {
