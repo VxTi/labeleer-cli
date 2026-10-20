@@ -22,6 +22,7 @@ async function main(): Promise<void> {
   );
 
   const accessTokenRes = await resolveAccessToken(values['access-token']);
+
   if (!accessTokenRes.ok) {
     info(accessTokenRes.error);
     process.exit(1);

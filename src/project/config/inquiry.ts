@@ -40,11 +40,7 @@ export async function inquireProjectConfig(
     process.exit(0);
   }
 
-  const projectRes = await createProjectConfig(accessToken, configPath);
-
-  if (!projectRes.ok) return projectRes;
-
-  return Ok({ ...projectRes.value, accessToken });
+  return await createProjectConfig(accessToken, configPath);
 }
 
 export async function getProjectConfig(
