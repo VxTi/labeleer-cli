@@ -1,3 +1,4 @@
+import { exists } from '@/files';
 import { entries, fromEntries, isNil } from '@vxti/typed';
 import type { Config, LabeleerFile } from './config/common';
 import {
@@ -96,8 +97,4 @@ async function createFile(
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
   }
   await fs.writeFile(absolutePath, file.content, { encoding: 'utf-8' });
-}
-
-async function exists(path: string): Promise<boolean> {
-  return fs.access(path, fs.constants.F_OK).then(() => true);
 }

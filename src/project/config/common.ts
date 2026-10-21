@@ -1,4 +1,5 @@
 import { Err, Ok, type Result } from '@/core/result';
+import { type AbsolutePath, type LabeleerFile } from '@/files';
 import {
   isNonEmptyArray,
   mapConstantArray,
@@ -11,17 +12,6 @@ import type {
   Locale,
   TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
-import path from 'node:path';
-
-export const cwd = process.cwd();
-
-export type AbsolutePath = string & {};
-
-export interface LabeleerFile {
-  directoryPath: string;
-  filename: string;
-  absolutePath: AbsolutePath;
-}
 
 export interface Config {
   projectId: string;
@@ -77,14 +67,4 @@ export async function tryGetLocales(
   }
 
   return Ok({ locales, referenceLocale: locales[0] });
-}
-
-export function toLabeleerFile(filePath: AbsolutePath): LabeleerFile {
-  const filename = path.basename(filePath);
-  const directoryPath = path.dirname(filePath);
-  return {
-    directoryPath,
-    filename,
-    absolutePath: filePath,
-  };
 }

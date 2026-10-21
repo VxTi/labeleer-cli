@@ -1,17 +1,12 @@
 import { Err, Ok, type Result } from '@/core/result';
+import { cwd, exists, toLabeleerFile } from '@/files';
 import { getTranslationDataset } from '@/project/dataset';
 import { entries, fromEntries } from '@vxti/typed';
 import fs from 'node:fs';
 import ora from 'ora';
 import { ProjectConfigSchema } from './schema';
-import {
-  type Config,
-  cwd,
-  DEFAULT_CONFIG_FILE_NAME,
-  toLabeleerFile,
-  tryGetLocales,
-} from './common';
-import { createProjectConfig } from '../create-project';
+import { type Config, DEFAULT_CONFIG_FILE_NAME, tryGetLocales } from './common';
+import { createProjectConfig } from './create';
 import { exitMessage, theme } from '@/utils';
 import { select } from '@inquirer/prompts';
 import { readFile } from 'fs/promises';
@@ -27,7 +22,7 @@ export async function inquireProjectConfig(
   if (config.ok) return config;
 
   const createNew = await select({
-    message: `${config.error}.\n    Would you like to create a new one?`,
+    message: `Failed to load project:\n    ${config.error}.\n    Would you like to create a new one?`,
     choices: [
       { name: 'Yes', value: true },
       { name: 'No', value: false },
@@ -70,6 +65,25 @@ export async function getProjectConfig(
 
   const { projectId, format } = config;
 
+  const translationFilePath: Config['path'] =
+    config.type === 'single'
+      ? {
+          ref: 'single',
+          value: toLabeleerFile(path.resolve(cwd, config.labelFile)),
+        }
+      : {
+          ref: 'several',
+          value: fromEntries(
+            entries(config.paths).map(([locale, relativePath]) => [
+              locale,
+              toLabeleerFile(path.resolve(rootDir, relativePath!)),
+            ])
+          ),
+        };
+
+  const existenceRes = await checkForFileExistence(translationFilePath);
+  if (!existenceRes.ok) return existenceRes;
+
   const rootDir = path.resolve(cwd, config.rootDir);
   return Ok<Config>({
     projectId,
@@ -80,20 +94,24 @@ export async function getProjectConfig(
     accessToken,
     configFile: toLabeleerFile(configFilePath),
     translations,
-    path:
-      config.type === 'single'
-        ? {
-            ref: 'single',
-            value: toLabeleerFile(path.resolve(cwd, config.labelFile)),
-          }
-        : {
-            ref: 'several',
-            value: fromEntries(
-              entries(config.paths).map(([locale, relativePath]) => [
-                locale,
-                toLabeleerFile(path.resolve(rootDir, relativePath!)),
-              ])
-            ),
-          },
+    path: translationFilePath,
   });
+}
+
+async function checkForFileExistence(
+  path: Config['path']
+): Promise<Result<undefined>> {
+  if (path.ref === 'single') {
+    return await exists(path.value.absolutePath)
+      .then(() => Ok())
+      .catch(() => Err("Primary label file doesn't exist"));
+  }
+
+  return await Promise.all(
+    entries(path.value).map(([locale, file]) =>
+      exists(file!.absolutePath)
+        .then(() => Ok())
+        .catch(() => Err(`Label file for locale ${locale} doesn't exist`))
+    )
+  ).then(res => res.reduce((acc, cur) => (acc.ok ? cur : acc), Ok()));
 }

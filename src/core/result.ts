@@ -16,7 +16,7 @@ export interface ErrorStack<T extends string> {
 export type Result<TOutput, TErr = string> =
   SuccessResult<TOutput> | ErrorResult<TErr>;
 
-export function Ok<T>(value: T): SuccessResult<T> {
+export function Ok<T = undefined>(value: T = undefined as T): SuccessResult<T> {
   return { ok: true, value };
 }
 

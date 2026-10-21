@@ -1,18 +1,17 @@
 import { translate } from '@/core/i18n';
 import { Ok, type Result } from '@/core/result';
+import { type AbsolutePath, toLabeleerFile } from '@/files';
 import { entries, fromEntries, isNonEmptyArray } from '@vxti/typed';
 import type { RawProjectConfig } from '@/project/config/schema';
 import fs from 'node:fs/promises';
 import {
-  type AbsolutePath,
   type Config,
   DEFAULT_CONFIG_FILE_NAME,
   type SafeConfig,
-  toLabeleerFile,
   tryGetLocales,
-} from './config/common';
-import { getTranslationDataset } from './dataset';
-import { updateLocalLabelFile } from './label-file';
+} from './common';
+import { getTranslationDataset } from '../dataset';
+import { updateLocalLabelFile } from '../label-file';
 import { theme } from '@/utils';
 import { input, select } from '@inquirer/prompts';
 import {
