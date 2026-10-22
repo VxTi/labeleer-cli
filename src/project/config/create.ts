@@ -7,6 +7,7 @@ import fs from 'node:fs/promises';
 import {
   type Config,
   DEFAULT_CONFIG_FILE_NAME,
+  type Paths,
   type SafeConfig,
   tryGetLocales,
 } from './common';
@@ -94,7 +95,7 @@ function getInitialFilePaths(
   format: FileFormat,
   locales: Locale[],
   referenceLocale: Locale
-): Config['path'] {
+): Paths {
   // A hacky way to initialize the config file with empty translations
   // This way we get the file paths from the transformer
   const transformer = defaultTransformerSet.getByFormat(format);

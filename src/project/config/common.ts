@@ -13,6 +13,28 @@ import type {
   TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 
+interface SingularPath {
+  ref: 'single';
+  value: LabeleerFile;
+}
+
+interface ComposedPaths {
+  ref: 'several';
+  value: Partial<Record<Locale, LabeleerFile>>;
+}
+
+export type Paths = SingularPath | ComposedPaths;
+
+export const enum ProjectReadFailure {
+  LABEL_FILE_MISSING_PRIMARY = 'label-file-missing-primary',
+  LABEL_FILE_MISSING_ONE_OR_MORE = 'label-file-missing-some',
+  PROJECT_FILE_MISSING = 'project-file-missing',
+  PROJECT_FILE_CORRUPT = 'project-file-corrupt',
+  NO_LOCALES = 'no-locales',
+  NETERR_LOCALES = 'neterr-locales',
+  NETERR_TRANSLATIONS = 'neterr-translators',
+}
+
 export interface Config {
   projectId: string;
   format: FileFormat;
@@ -22,15 +44,7 @@ export interface Config {
   referenceLocale: Locale;
   configFile: LabeleerFile;
   translations: TranslationDataset;
-  path:
-    | {
-        ref: 'several';
-        value: Partial<Record<Locale, LabeleerFile>>;
-      }
-    | {
-        ref: 'single';
-        value: LabeleerFile;
-      };
+  path: Paths;
 }
 export type SafeConfig = Omit<Config, 'accessToken'>;
 
@@ -40,7 +54,10 @@ export async function tryGetLocales(
   accessToken: string,
   projectId: string
 ): Promise<
-  Result<{ locales: NonEmptyArray<Locale>; referenceLocale: Locale }>
+  Result<
+    { locales: NonEmptyArray<Locale>; referenceLocale: Locale },
+    ProjectReadFailure
+  >
 > {
   const languagesRes = await getLanguages(accessToken, projectId);
 
@@ -63,7 +80,7 @@ export async function tryGetLocales(
 
   const locales = await inquireCreateLocales();
   if (!locales) {
-    return Err('No locales were created');
+    return Err(ProjectReadFailure.NO_LOCALES);
   }
 
   return Ok({ locales, referenceLocale: locales[0] });

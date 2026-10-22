@@ -1,6 +1,6 @@
 import { inquireAndExecuteAction } from '@/actions/inquiry';
 import { translate } from '@/core/i18n';
-import { cwd }                     from '@/files';
+import { cwd } from '@/files';
 import { resolveAccessToken } from '@/project/access-token';
 import { inquireProjectConfig } from '@/project/config/inquiry';
 import { exitMessage, info } from '@/utils';

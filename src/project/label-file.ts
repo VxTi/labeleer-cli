@@ -1,6 +1,6 @@
-import { exists } from '@/files';
+import { exists, type LabeleerFile } from '@/files';
 import { entries, fromEntries, isNil } from '@vxti/typed';
-import type { Config, LabeleerFile } from './config/common';
+import type { Config } from './config/common';
 import {
   defaultTransformerSet,
   type Locale,

@@ -1,11 +1,12 @@
+import type { TranslationDataset } from '@labeleer/translation-dataset-transformers';
+import { ProjectReadFailure } from '@/project/config/common';
 import { Err, Ok, type Result } from '@/core/result';
 import { labeleer } from '@labeleer/api';
-import type { TranslationDataset } from '@labeleer/translation-dataset-transformers';
 
 export async function getTranslationDataset(
   accessToken: string,
   projectId: string
-): Promise<Result<TranslationDataset>> {
+): Promise<Result<TranslationDataset, ProjectReadFailure>> {
   const set: TranslationDataset = {};
 
   const pageSize = 100;
@@ -21,7 +22,7 @@ export async function getTranslationDataset(
       },
     });
     if (error) {
-      return Err(error.error);
+      return Err(ProjectReadFailure.NETERR_TRANSLATIONS);
     }
 
     offset += pageSize;
