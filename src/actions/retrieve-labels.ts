@@ -28,11 +28,14 @@ export async function tryRetrieveLabels(config: Config): Promise<void> {
       translate({
         label: 'actions.retrieve.success',
         args: [
-          toRelativePath(
-            Object.entries(config.path.value)
-              .map(([loc, relativePath]) => `${loc} -> ${relativePath}`)
-              .join(', ')
-          ),
+          config.path.ref === 'single'
+            ? toRelativePath(config.path.value.absolutePath)
+            : Object.entries(config.path.value)
+                .map(
+                  ([loc, file]) =>
+                    `${loc} -> ${toRelativePath(file.absolutePath)}`
+                )
+                .join(', '),
         ],
       })
     )

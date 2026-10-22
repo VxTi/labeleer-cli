@@ -10,7 +10,6 @@ import { getLanguages } from '@/project/locales';
 import type {
   FileFormat,
   Locale,
-  TranslationDataset,
 } from '@labeleer/translation-dataset-transformers';
 
 interface SingularPath {
@@ -32,7 +31,6 @@ export const enum ProjectReadFailure {
   PROJECT_FILE_CORRUPT = 'project-file-corrupt',
   NO_LOCALES = 'no-locales',
   NETERR_LOCALES = 'neterr-locales',
-  NETERR_TRANSLATIONS = 'neterr-translators',
 }
 
 export interface Config {
@@ -43,7 +41,6 @@ export interface Config {
   locales: NonEmptyArray<Locale>;
   referenceLocale: Locale;
   configFile: LabeleerFile;
-  translations: TranslationDataset;
   path: Paths;
 }
 export type SafeConfig = Omit<Config, 'accessToken'>;

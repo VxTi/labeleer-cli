@@ -51,7 +51,6 @@ export async function createProjectConfig(
     projectId,
     format,
     rootDir,
-    translations,
     locales,
     referenceLocale,
     configFile,

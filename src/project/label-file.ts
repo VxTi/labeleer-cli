@@ -66,10 +66,10 @@ function resolvePath(
   config: Config,
   serializedFile: SerializationFile
 ): string {
-  const { locale, filePath } = serializedFile;
+  const { locale } = serializedFile;
 
   if (config.path.ref === 'single') {
-    return path.join(config.rootDir, filePath);
+    return config.path.value.absolutePath;
   }
 
   if (isNil(locale)) {
@@ -77,6 +77,7 @@ function resolvePath(
       `Missing locale for serialized file: ${serializedFile.filePath}`
     );
   }
+
   const localePath = config.path.value[locale];
   if (isNil(localePath)) {
     throw new Error(

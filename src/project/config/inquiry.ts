@@ -1,6 +1,5 @@
 import { Err, Ok, type Result } from '@/core/result';
 import { cwd, exists, toLabeleerFile } from '@/files';
-import { getTranslationDataset } from '@/project/dataset';
 import { entries, fromEntries } from '@vxti/typed';
 import fs from 'node:fs';
 import ora from 'ora';
@@ -59,10 +58,6 @@ export async function inquireProjectConfig(
       return Err('Your project seems to not contain any languages');
     case ProjectReadFailure.NETERR_LOCALES:
       return Err("Something went wrong whilst getting the project's languages");
-    case ProjectReadFailure.NETERR_TRANSLATIONS:
-      return Err(
-        "Something went wrong whilst getting the project's translations"
-      );
   }
 }
 
@@ -90,13 +85,6 @@ export async function getProjectConfig(
   const localesRes = await tryGetLocales(accessToken, projectId);
   if (!localesRes.ok) return localesRes;
 
-  const translationsResult = await getTranslationDataset(
-    accessToken,
-    projectId
-  );
-  if (!translationsResult.ok) return translationsResult;
-  const translations = translationsResult.value;
-
   return Ok<Config>({
     projectId,
     referenceLocale: localesRes.value.referenceLocale,
@@ -105,7 +93,6 @@ export async function getProjectConfig(
     rootDir,
     accessToken,
     configFile: toLabeleerFile(configFilePath),
-    translations,
     path: translationFilePath,
   });
 }
