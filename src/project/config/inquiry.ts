@@ -1,3 +1,4 @@
+import { translate } from '@/core/i18n';
 import { Err, Ok, type Result } from '@/core/result';
 import { cwd, exists, toLabeleerFile } from '@/files';
 import { entries, fromEntries } from '@vxti/typed';
@@ -29,10 +30,16 @@ export async function inquireProjectConfig(
 
   if (config.error === ProjectReadFailure.PROJECT_FILE_MISSING) {
     const createNew = await select({
-      message: `Failed to load project:\n    ${config.error}.\n    Would you like to create a new one?`,
+      message: translate({ label: 'project.error.missing' }),
       choices: [
-        { name: 'Yes', value: true },
-        { name: 'No', value: false },
+        {
+          name: translate({ label: 'project.error.missing.create.yes' }),
+          value: true,
+        },
+        {
+          name: translate({ label: 'project.error.missing.create.no' }),
+          value: false,
+        },
       ],
       theme,
     });
@@ -47,17 +54,15 @@ export async function inquireProjectConfig(
 
   switch (config.error) {
     case ProjectReadFailure.LABEL_FILE_MISSING_PRIMARY:
-      return Err(
-        'Your main label file seems to be missing.\nMake sure your project config points to the right file path'
-      );
+      return Err(translate({ label: 'project.error.missingPrimary' }));
     case ProjectReadFailure.LABEL_FILE_MISSING_ONE_OR_MORE:
-      return Err('One or more translation files are missing');
+      return Err(translate({ label: 'project.error.missingSome' }));
     case ProjectReadFailure.PROJECT_FILE_CORRUPT:
-      return Err('Your project file seems to be corrupt');
+      return Err(translate({ label: 'project.error.configCorrupt' }));
     case ProjectReadFailure.NO_LOCALES:
-      return Err('Your project seems to not contain any languages');
+      return Err(translate({ label: 'project.error.noLocales' }));
     case ProjectReadFailure.NETERR_LOCALES:
-      return Err("Something went wrong whilst getting the project's languages");
+      return Err(translate({ label: 'project.error.network.locales' }));
   }
 }
 

@@ -1,129 +1,179 @@
 {
   "action.create.additional": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Would you like to create another one?"
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "action.create.additional.no": {
-    "tags": ["create"],
     "translations": {
       "en_US": "No"
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "action.create.additional.yes": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Yes"
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "action.create.error.empty": {
-    "tags": ["create"],
     "translations": {
       "en_US": "No translations provided. Label creation aborted."
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "action.create.error.tooShort": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Label must be at least {0} characters long"
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "action.create.title": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Enter the name of the new label:"
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "action.create.value": {
-    "tags": ["actions"],
     "translations": {
       "en_US": "Enter the value for locale {0}{1}:"
-    }
+    },
+    "tags": [
+      "actions"
+    ]
   },
   "action.publish.loading": {
-    "tags": ["publish"],
     "translations": {
       "en_US": "Synchronizing with project..."
-    }
+    },
+    "tags": [
+      "publish"
+    ]
   },
   "actions.cancel": {
-    "tags": ["cancel"],
     "translations": {
       "en_US": "⨯ Cancel"
-    }
+    },
+    "tags": [
+      "cancel"
+    ]
   },
   "actions.create.success": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Label '{0}' has been added to the label file"
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "actions.create.sync": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Publishing label..."
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "actions.create.sync.failure": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Failed to publish label to Labeleer."
-    }
+    },
+    "tags": [
+      "create"
+    ]
   },
   "actions.createNew": {
-    "tags": ["create"],
     "translations": {
       "en_US": "Create new label"
-    }
+    },
+    "tags": [
+      "create"
+    ]
+  },
+  "actions.project.create.configPath": {
+    "translations": {
+      "en_US": "Enter the relative path to the config file:"
+    },
+    "tags": [
+      "create"
+    ]
   },
   "actions.publish": {
-    "tags": ["publish"],
     "translations": {
       "en_US": "Publish local changes"
-    }
+    },
+    "tags": [
+      "publish"
+    ]
   },
   "actions.publish.loading.failure": {
-    "tags": ["publish"],
     "translations": {
       "en_US": "Something went wrong whilst synchronizing"
-    }
+    },
+    "tags": [
+      "publish"
+    ]
   },
   "actions.publish.success": {
-    "tags": ["publish"],
     "translations": {
       "en_US": "Local labels have been published to Labeleer"
-    }
+    },
+    "tags": [
+      "publish"
+    ]
   },
   "actions.retrieve": {
-    "tags": ["retrieve"],
     "translations": {
       "en_US": "Sync remote changes"
-    }
+    },
+    "tags": [
+      "retrieve"
+    ]
   },
   "actions.retrieve.failure": {
-    "tags": ["retrieve"],
     "translations": {
       "en_US": "Failed to retrieve labels"
-    }
+    },
+    "tags": [
+      "retrieve"
+    ]
   },
   "actions.retrieve.loading": {
-    "tags": ["retrieve"],
     "translations": {
       "en_US": "Retrieving labels..."
-    }
+    },
+    "tags": [
+      "retrieve"
+    ]
   },
   "actions.retrieve.success": {
-    "tags": ["retrieve"],
     "translations": {
       "en_US": "Labels have been written to {0}"
-    }
+    },
+    "tags": [
+      "retrieve"
+    ]
   },
   "actions.title": {
-    "tags": ["actions"],
     "translations": {
       "en_US": "What would you like to do?"
-    }
+    },
+    "tags": [
+      "actions"
+    ]
   },
   "cli.exitMessage": {
     "translations": {
@@ -135,40 +185,112 @@
       "en_US": "Labeleer CLI"
     }
   },
-  "project.create.format.error.alreadyExists": {
-    "tags": ["create"],
+  "labels.read.failure": {
     "translations": {
-      "en_US": "Labels file already exists."
+      "en_US": "Missing label files for locales: {0}"
     }
   },
+  "project.create.format.error.alreadyExists": {
+    "translations": {
+      "en_US": "Labels file already exists."
+    },
+    "tags": [
+      "create"
+    ]
+  },
   "project.create.format.title": {
-    "tags": ["create"],
     "translations": {
       "en_US": "What kind of project would you like to create?"
+    },
+    "tags": [
+      "create"
+    ]
+  },
+  "project.create.success": {
+    "translations": {
+      "en_US": "Initialized project at {0}"
+    }
+  },
+  "project.error.configCorrupt": {
+    "translations": {
+      "en_US": "Your project file seems to be corrupt"
+    }
+  },
+  "project.error.missing": {
+    "translations": {
+      "en_US": "Unable to locate a project file. Would you like to create a new one?"
+    }
+  },
+  "project.error.missing.create.no": {
+    "translations": {
+      "en_US": "No"
+    }
+  },
+  "project.error.missing.create.yes": {
+    "translations": {
+      "en_US": "Yes"
+    }
+  },
+  "project.error.missingPrimary": {
+    "translations": {
+      "en_US": "Your main label file seems to be missing.\nMake sure your project config points to the right file path"
+    }
+  },
+  "project.error.missingSome": {
+    "translations": {
+      "en_US": "One or more translation files are missing"
+    }
+  },
+  "project.error.network.locales": {
+    "translations": {
+      "en_US": "Something went wrong whilst getting the project's languages"
+    }
+  },
+  "project.error.noLocales": {
+    "translations": {
+      "en_US": "Your project seems to not contain any languages"
+    }
+  },
+  "project.info.languages": {
+    "translations": {
+      "en_US": "Found {0} language(s)"
+    }
+  },
+  "project.info.projectFile": {
+    "translations": {
+      "en_US": "Project file: {0} {1} {2}"
     }
   },
   "project.inquire.format": {
-    "tags": ["project"],
     "translations": {
       "en_US": "Select the label file format to fetch:"
-    }
+    },
+    "tags": [
+      "project"
+    ]
   },
   "project.inquire.id": {
-    "tags": ["project"],
     "translations": {
       "en_US": "Please enter your project ID"
-    }
+    },
+    "tags": [
+      "project"
+    ]
   },
   "project.load.error.format": {
-    "tags": ["project"],
     "translations": {
       "en_US": "The config file seems to be corrupt."
-    }
+    },
+    "tags": [
+      "project"
+    ]
   },
   "project.locales.failure": {
-    "tags": ["project"],
     "translations": {
       "en_US": "Failed to retrieve project languages"
-    }
+    },
+    "tags": [
+      "project"
+    ]
   }
 }

@@ -2,5 +2,5 @@
   "projectId": "aL5CN2AqUKwP",
   "format": "json",
   "rootDir": ".",
-  "labelFile": "./src/project/labels.json"
+  "labelFile": "./src/core/labels.json"
 }

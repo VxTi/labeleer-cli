@@ -38,10 +38,20 @@ async function main(): Promise<void> {
 
   const config = configRes.value;
   info(
-    `Found ${chalk.underline(Object.keys(config.translations).length)} translation(s) with ${chalk.underline(config.locales.length)} language(s)`
+    translate({
+      label: 'project.info.languages',
+      args: [chalk.underline(config.locales.length)],
+    })
   );
   info(
-    `Project file: ${chalk.underline(path.relative(cwd, config.configFile.absolutePath))} ${chalk.gray('▪')} ${chalk.underline(config.format)}`
+    translate({
+      label: 'project.info.projectFile',
+      args: [
+        chalk.underline(path.relative(cwd, config.configFile.absolutePath)),
+        chalk.gray('▪'),
+        chalk.underline(config.format),
+      ],
+    })
   );
 
   await inquireAndExecuteAction(config);
